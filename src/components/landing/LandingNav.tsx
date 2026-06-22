@@ -52,15 +52,16 @@ export default function LandingNav() {
 
         {/* Right */}
         <div className="ml-auto flex items-center gap-3">
-          <Button
-            variant="accent"
-            size="sm"
-            className="hidden sm:flex font-black uppercase tracking-widest"
-            onClick={() => navigate("/dashboard")}
-          >
-            Launch App
-          </Button>
-
+          <div className="hidden sm:block" >
+              <Button
+                variant="accent"
+                size="sm"
+                className="hidden sm:flex font-black uppercase tracking-widest"
+                onClick={() => navigate("/dashboard")}
+              >
+                Launch App
+              </Button>
+              </div>
           {/* Mobile hamburger */}
           <button
             onClick={() => setMenuOpen((p) => !p)}
