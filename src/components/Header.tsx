@@ -12,7 +12,7 @@ export default function AppHeader() {
   const { pathname } = useLocation();
 
   return (
-    <header className="h-16 bg-primary-900 border-b border-white/10 px-4 sm:px-8 flex items-center sticky top-0 z-30 gap-6">
+    <header className="h-16 bg-primary-800 border-b border-white/10 px-4 sm:px-8 flex items-center sticky top-0 z-30 gap-6">
       {/* Brand */}
       <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
         <img
@@ -29,18 +29,24 @@ export default function AppHeader() {
       </Link>
 
       {/* Nav tabs */}
-      <nav className="hidden sm:flex items-center h-16 gap-1" aria-label="Main navigation">
+      <nav
+        className="hidden sm:flex items-center h-16 gap-1"
+        aria-label="Main navigation"
+      >
         {navItems.map(({ label, to }) => {
-          const active = pathname === to || (to !== '/dashboard' && pathname.startsWith(to));
+          const active =
+            pathname === to || (to !== "/dashboard" && pathname.startsWith(to));
           return (
             <Link
               key={to}
               to={to}
               className={`
                 px-4 h-full inline-flex items-center text-sm font-medium border-b-2 transition-colors
-                ${active
-                  ? 'text-white border-accent-500'
-                  : 'text-white/60 border-transparent hover:text-white hover:border-white/30'}
+                ${
+                  active
+                    ? "text-white border-accent-500"
+                    : "text-white/60 border-transparent hover:text-white hover:border-white/30"
+                }
               `}
             >
               {label}
@@ -66,7 +72,7 @@ export default function AppHeader() {
           aria-label="Notifications"
         >
           <Bell size={19} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent-500 rounded-full border-2 border-primary-900" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent-500 rounded-full border-2 border-primary-800" />
         </button>
 
         <button

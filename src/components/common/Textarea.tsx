@@ -1,4 +1,4 @@
-import { forwardRef, TextareaHTMLAttributes } from 'react';
+import { forwardRef, TextareaHTMLAttributes, useState } from 'react';
 import type { FieldError } from 'react-hook-form';
 import { AlertCircle } from 'lucide-react';
 import { cn } from '@/utils/cn';
@@ -8,7 +8,6 @@ export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElemen
   required?: boolean;
   error?: FieldError | string;
   hint?: string;
-  /** Shows a character count if maxLength is set */
   showCount?: boolean;
   containerClassName?: string;
 }
@@ -27,6 +26,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       maxLength,
       value,
       defaultValue,
+      onChange,
       ...props
     },
     ref,
@@ -35,20 +35,18 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const errorMessage = typeof error === 'string' ? error : error?.message;
     const hasError = Boolean(errorMessage);
 
+    // Track length for uncontrolled usage
+    const [uncontrolledLength, setUncontrolledLength] = useState(
+      typeof defaultValue === 'string' ? defaultValue.length : 0,
+    );
+
     const currentLength =
-      typeof value === 'string'
-        ? value.length
-        : typeof defaultValue === 'string'
-          ? defaultValue.length
-          : 0;
+      typeof value === 'string' ? value.length : uncontrolledLength;
 
     return (
       <div className={cn('flex flex-col', containerClassName)}>
         {label && (
-          <label
-            htmlFor={inputId}
-            className={cn('label', required && 'label--required')}
-          >
+          <label htmlFor={inputId} className={cn('label', required && 'label--required')}>
             {label}
           </label>
         )}
@@ -61,25 +59,25 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           defaultValue={defaultValue}
           aria-invalid={hasError}
           aria-describedby={
-            hasError
-              ? `${inputId}-error`
-              : hint
-                ? `${inputId}-hint`
-                : undefined
+            hasError ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined
           }
+          onChange={(e) => {
+            setUncontrolledLength(e.target.value.length);
+            onChange?.(e);
+          }}
           className={cn(
-            'input resize-y min-h-[96px]',
+            'input resize-y min-h-[120px]',
             hasError && 'input--error',
             className,
           )}
           {...props}
         />
 
-        <div className="flex items-start justify-between mt-1.5 gap-2">
+        <div className="flex items-start justify-between gap-2">
           <div>
             {hasError && (
               <p id={`${inputId}-error`} role="alert" className="field-error">
-                <AlertCircle size={12} />
+                <AlertCircle size={12} className="shrink-0" />
                 {errorMessage}
               </p>
             )}
@@ -92,8 +90,8 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           {showCount && maxLength && (
             <span
               className={cn(
-                'text-[11px] tabular-nums shrink-0',
-                currentLength >= maxLength ? 'text-red-500' : 'text-gray-400',
+                'text-[11px] tabular-nums shrink-0 mt-1.5',
+                currentLength >= maxLength ? 'text-red-500 font-semibold' : 'text-gray-400',
               )}
             >
               {currentLength}/{maxLength}

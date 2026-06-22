@@ -15,7 +15,6 @@ export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   error?: FieldError | string;
   hint?: string;
   options: SelectOption[];
-  /** Placeholder option shown when no value is selected */
   placeholder?: string;
   containerClassName?: string;
 }
@@ -43,10 +42,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
     return (
       <div className={cn('flex flex-col', containerClassName)}>
         {label && (
-          <label
-            htmlFor={inputId}
-            className={cn('label', required && 'label--required')}
-          >
+          <label htmlFor={inputId} className={cn('label', required && 'label--required')}>
             {label}
           </label>
         )}
@@ -57,14 +53,10 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             id={inputId}
             aria-invalid={hasError}
             aria-describedby={
-              hasError
-                ? `${inputId}-error`
-                : hint
-                  ? `${inputId}-hint`
-                  : undefined
+              hasError ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined
             }
             className={cn(
-              'input appearance-none pr-9 cursor-pointer',
+              'input appearance-none pr-10 cursor-pointer',
               hasError && 'input--error',
               className,
             )}
@@ -82,20 +74,17 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ))}
           </select>
 
-          <ChevronDown
-            size={16}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-            aria-hidden="true"
-          />
+          <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+            <ChevronDown size={16} className="text-gray-400" aria-hidden="true" />
+          </span>
         </div>
 
         {hasError && (
           <p id={`${inputId}-error`} role="alert" className="field-error">
-            <AlertCircle size={12} />
+            <AlertCircle size={12} className="shrink-0" />
             {errorMessage}
           </p>
         )}
-
         {!hasError && hint && (
           <p id={`${inputId}-hint`} className="field-hint">
             {hint}

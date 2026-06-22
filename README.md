@@ -17,9 +17,10 @@ MTStudio is an internal MVP tool built by the Tonative team. It lets anyone uplo
 9. [Common Components](#common-components)
 10. [Form Validation](#form-validation)
 11. [Error Handling & Notifications](#error-handling--notifications)
-12. [Aliases & Path Resolution](#aliases--path-resolution)
-13. [Environment Variables](#environment-variables)
-14. [Best Practices](#best-practices)
+12. [Component Showcase (Dev)](#component-showcase-dev)
+13. [Aliases & Path Resolution](#aliases--path-resolution)
+14. [Environment Variables](#environment-variables)
+15. [Best Practices](#best-practices)
 
 ---
 
@@ -454,6 +455,79 @@ dispatch(toast.warning({ message: 'File exceeds recommended size.' }));
 
 ---
 
+## Component Showcase (Dev)
+
+A dedicated interactive page lets every contributor visually inspect and interact with every common component without needing Storybook or any external tool.
+
+### How to open it
+
+1. Start the dev server:
+   ```bash
+   npm run dev
+   ```
+2. Navigate to:
+   ```
+   http://localhost:3000/dev/components
+   ```
+
+This route is **only registered when `import.meta.env.DEV` is `true`** — i.e. only during `npm run dev`. It is not compiled into production builds and cannot be accessed on any deployed environment.
+
+### What the page covers
+
+| Section | What to interact with |
+|---|---|
+| **Button** | All 5 variants side by side, 3 sizes, leading/trailing icon examples, click "Save changes" to trigger a 2-second loading spinner, disabled states, full-width layout |
+| **Spinner** | 4 sizes, 5 colour options — including one on a dark background |
+| **Badge** | 5 variants (`info`, `success`, `warning`, `error`, `neutral`), dot indicator, small size |
+| **Skeleton** | Single line, multi-line paragraph (last line narrower for realism), card placeholder, button placeholder, circle avatars, composed loading card combining skeleton parts |
+| **Toast** | Fire each of the 4 variants (success, error, info, warning) individually. "Trigger 3 in sequence" fires them 800 ms apart so you see the stack animate. Error toasts stay until you click ×; others auto-dismiss after 4 s |
+| **TextInput** | Default, required asterisk, hint + leading icon, error state with message, password field with show/hide toggle, disabled, live validation as you type |
+| **Textarea** | Default, character counter (tracks as you type), error state, disabled |
+| **Select** | Placeholder option, required, error state, disabled |
+| **Checkbox** | Interactive check/uncheck, with sub-description, error state, disabled unchecked, disabled checked |
+| **RadioGroup** | Vertical orientation with per-option descriptions, horizontal orientation with a disabled option |
+| **ErrorBoundary** | Click "Trigger render crash" to throw a real error inside a scoped `ErrorBoundary`. Only that component is replaced with the fallback — the rest of the page is unaffected. "Try again" resets just the boundary. |
+
+### How input fields are styled
+
+Input fields (`TextInput`, `Textarea`, `Select`) use a single `.input` CSS class defined in `src/index.css`.
+
+The `.input` class is written as **raw CSS** (not `@apply` utilities). In Tailwind v4, `@apply` inside `@layer components` can be overridden by plugin resets that run at a lower layer. Writing raw CSS guarantees the styles win unconditionally.
+
+The `@tailwindcss/forms` plugin is configured with **`strategy: class`**:
+
+```css
+@plugin "@tailwindcss/forms" { strategy: class }
+```
+
+Without `strategy: class`, the plugin applies `border-radius: 0` to all bare `<input>` elements at the base layer, which overrides our `.input` class and makes fields render as unstyled flat boxes. The `class` strategy restricts the plugin to only style elements with `.form-input` / `.form-select` / `.form-textarea` — it never touches elements using our `.input` class.
+
+Similarly, `.badge-*` classes are each written as **self-contained raw CSS** rather than `@apply badge ...`. In Tailwind v4, `@apply` cannot reference other component classes defined in the same `@layer components` block — it only works with utility classes.
+
+**Rules — do not break these:**
+- Do not remove `strategy: class` from the `@plugin` declaration
+- Do not convert `.input` back to `@apply` utilities
+- Do not use `@apply someComponentClass` to extend another component class. Write the styles out in full instead
+
+### Adding a new component to the showcase
+
+The showcase page is at `src/pages/ComponentShowcasePage.tsx`. Every component gets its own `<Section>` block with `<Row>` groups inside. Follow the existing pattern:
+
+```tsx
+<Section title="MyComponent">
+  <Row label="Default">
+    <MyComponent />
+  </Row>
+  <Row label="Error state">
+    <MyComponent error="Something went wrong" />
+  </Row>
+</Section>
+```
+
+The showcase is the **single source of visual truth** for the component library. Whenever you build or change a common component, update the showcase to reflect its current states.
+
+---
+
 ## Aliases & Path Resolution
 
 Both Vite and TypeScript are configured with these aliases:
@@ -505,7 +579,7 @@ Types are declared in `src/vite-env.d.ts`. Add new variables there whenever intr
 - All props require an explicit `interface` or `type`
 - Avoid `any` — use `unknown` and narrow, or define a type in `services/types/`
 - API response shapes belong in `services/types/`, never inside component files
-- Zod schema types are inferred — never duplicate them manually
+- Zod schema types are inferred. Do not duplicate them manually
 
 ### State
 - Server state (fetch/mutate) → RTK Query

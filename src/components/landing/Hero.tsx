@@ -4,7 +4,7 @@ import { Button } from "@/components/common/Button";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden bg-primary-900 min-h-[92vh] flex items-center">
+    <section className="relative overflow-hidden bg-primary-800 min-h-[92vh] flex items-center">
       {/* Subtle grid texture */}
       <div
         className="absolute inset-0 opacity-[0.04]"

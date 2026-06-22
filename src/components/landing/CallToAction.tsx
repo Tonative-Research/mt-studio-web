@@ -33,7 +33,7 @@ export default function CallToAction() {
             size="lg"
             trailingIcon={<ArrowRight size={16} />}
             className="shadow-2xl shadow-accent-500/30 font-black uppercase tracking-widest"
-            onClick={() => window.location.href = '/dashboard'}
+            onClick={() => (window.location.href = "/dashboard")}
           >
             Open MT Studio
           </Button>

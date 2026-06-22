@@ -13,7 +13,9 @@ export default function PreviewTable() {
       <div className="px-6 lg:px-8 py-5 flex items-center justify-between border-b border-gray-100 bg-white">
         <div className="flex items-center gap-3">
           <Cloud className="text-gray-400" size={20} />
-          <h3 className="font-bold text-lg tracking-tight text-gray-900">Output Preview</h3>
+          <h3 className="font-bold text-lg tracking-tight text-gray-900">
+            Output Preview
+          </h3>
         </div>
         <Button
           variant="accent"
@@ -28,7 +30,7 @@ export default function PreviewTable() {
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-primary-500 text-white">
+            <tr className="bg-primary-800 text-white">
               <th className="px-6 lg:px-8 py-4 text-[10px] font-black uppercase tracking-widest border-r border-white/10 w-20">
                 Row
               </th>

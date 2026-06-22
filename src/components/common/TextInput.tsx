@@ -4,19 +4,12 @@ import { AlertCircle } from 'lucide-react';
 import { cn } from '@/utils/cn';
 
 export interface TextInputProps extends InputHTMLAttributes<HTMLInputElement> {
-  /** Label text shown above the input */
   label?: string;
-  /** Whether the field is required — appends a red asterisk to the label */
   required?: boolean;
-  /** RHF FieldError object or a plain error string */
   error?: FieldError | string;
-  /** Hint text shown below the input when there is no error */
   hint?: string;
-  /** Icon or element rendered on the left inside the input */
   leadingAddon?: React.ReactNode;
-  /** Icon or element rendered on the right inside the input */
   trailingAddon?: React.ReactNode;
-  /** Wraps the entire field including label and error */
   containerClassName?: string;
 }
 
@@ -43,17 +36,14 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
     return (
       <div className={cn('flex flex-col', containerClassName)}>
         {label && (
-          <label
-            htmlFor={inputId}
-            className={cn('label', required && 'label--required')}
-          >
+          <label htmlFor={inputId} className={cn('label', required && 'label--required')}>
             {label}
           </label>
         )}
 
         <div className="relative flex items-center">
           {leadingAddon && (
-            <span className="absolute left-3 flex items-center text-gray-400 pointer-events-none">
+            <span className="absolute left-3.5 flex items-center text-gray-400 pointer-events-none z-10">
               {leadingAddon}
             </span>
           )}
@@ -63,24 +53,20 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
             id={inputId}
             aria-invalid={hasError}
             aria-describedby={
-              hasError
-                ? `${inputId}-error`
-                : hint
-                  ? `${inputId}-hint`
-                  : undefined
+              hasError ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined
             }
             className={cn(
               'input',
               hasError && 'input--error',
-              leadingAddon && 'pl-9',
-              trailingAddon && 'pr-9',
+              leadingAddon && 'pl-10',
+              trailingAddon && 'pr-10',
               className,
             )}
             {...props}
           />
 
           {trailingAddon && (
-            <span className="absolute right-3 flex items-center text-gray-400 pointer-events-none">
+            <span className="absolute right-3.5 flex items-center text-gray-400 z-10">
               {trailingAddon}
             </span>
           )}
@@ -88,11 +74,10 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
 
         {hasError && (
           <p id={`${inputId}-error`} role="alert" className="field-error">
-            <AlertCircle size={12} />
+            <AlertCircle size={12} className="shrink-0" />
             {errorMessage}
           </p>
         )}
-
         {!hasError && hint && (
           <p id={`${inputId}-hint`} className="field-hint">
             {hint}
