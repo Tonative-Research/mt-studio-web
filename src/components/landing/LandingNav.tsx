@@ -16,7 +16,7 @@ export default function LandingNav() {
     <nav
       className={`
         fixed top-0 left-0 right-0 z-50 transition-all duration-300
-        ${scrolled ? 'bg-primary-900/95 backdrop-blur-md shadow-lg shadow-black/20' : 'bg-transparent'}
+        ${scrolled ? "bg-primary-900/95 backdrop-blur-md shadow-lg shadow-black/20" : "bg-transparent"}
       `}
     >
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 h-16 flex items-center gap-8">
@@ -34,10 +34,16 @@ export default function LandingNav() {
 
         {/* Desktop links */}
         <div className="hidden sm:flex items-center gap-7 ml-4">
-          <a href="#how-it-works" className="text-sm font-medium text-white/50 hover:text-white transition-colors">
+          <a
+            href="#how-it-works"
+            className="text-sm font-medium text-white/50 hover:text-white transition-colors"
+          >
             How it works
           </a>
-          <a href="#languages" className="text-sm font-medium text-white/50 hover:text-white transition-colors">
+          <a
+            href="#languages"
+            className="text-sm font-medium text-white/50 hover:text-white transition-colors"
+          >
             Languages
           </a>
         </div>
@@ -46,7 +52,7 @@ export default function LandingNav() {
         <div className="ml-auto flex items-center gap-3">
           <Link
             to="/dashboard"
-            className="hidden sm:flex btn-accent text-xs font-black uppercase tracking-widest px-5 py-2.5"
+            className="hidden sm:flex btn-accent text-xs text-white uppercase tracking-widest px-5 py-2.5"
           >
             Launch App
           </Link>
@@ -82,7 +88,7 @@ export default function LandingNav() {
             <Link
               to="/dashboard"
               onClick={() => setMenuOpen(false)}
-              className="btn-accent w-full justify-center text-xs font-black uppercase tracking-widest py-3 mt-2"
+              className="w-full justify-center text-xs text-white uppercase tracking-widest py-3 mt-2"
             >
               Launch App
             </Link>
