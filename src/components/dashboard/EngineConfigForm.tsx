@@ -1,6 +1,8 @@
-import { ChevronDown, Wand2 } from 'lucide-react';
+import { Wand2 } from 'lucide-react';
+import { Button } from '@/components/common/Button';
+import { Select } from '@/components/common/Select';
 
-const languages = [
+const languageOptions = [
   { value: 'en-US', label: 'English (US)' },
   { value: 'yo-NG', label: 'Yoruba (Nigeria)' },
   { value: 'sw-TZ', label: 'Swahili (East Africa)' },
@@ -9,12 +11,12 @@ const languages = [
   { value: 'fr-FR', label: 'French' },
 ];
 
-const columns = [
+const columnOptions = [
   { value: 'text_content', label: 'text_content' },
   { value: 'description', label: 'description' },
 ];
 
-const models = [
+const modelOptions = [
   { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro' },
   { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash' },
   { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash' },
@@ -31,38 +33,37 @@ export default function EngineConfigForm() {
       </div>
 
       <div className="space-y-4 flex-1">
-        {[
-          { label: 'Source Language', options: languages, defaultValue: 'en-US' },
-          { label: 'Target Language', options: languages, defaultValue: 'yo-NG' },
-          { label: 'Column for Translation', options: columns, defaultValue: 'text_content' },
-          { label: 'Translation Model', options: models, defaultValue: 'gemini-1.5-flash' },
-        ].map(({ label, options, defaultValue }) => (
-          <div key={label}>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5 ml-1">
-              {label}
-            </label>
-            <div className="relative">
-              <select
-                defaultValue={defaultValue}
-                className="w-full h-11 bg-white border border-gray-200 rounded-lg px-4 pr-10 text-sm font-medium text-gray-900 appearance-none focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 transition-all cursor-pointer"
-              >
-                {options.map((o) => (
-                  <option key={o.value} value={o.value}>{o.label}</option>
-                ))}
-              </select>
-              <ChevronDown
-                size={16}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
-              />
-            </div>
-          </div>
-        ))}
+        <Select
+          label="Source Language"
+          options={languageOptions}
+          defaultValue="en-US"
+        />
+        <Select
+          label="Target Language"
+          options={languageOptions}
+          defaultValue="yo-NG"
+        />
+        <Select
+          label="Column for Translation"
+          options={columnOptions}
+          defaultValue="text_content"
+        />
+        <Select
+          label="Translation Model"
+          options={modelOptions}
+          defaultValue="gemini-1.5-flash"
+        />
       </div>
 
-      <button className="btn-primary mt-8 w-full py-3.5 shadow-lg shadow-primary-500/20">
-        <Wand2 size={18} />
-        <span className="font-bold text-sm tracking-wide">Initialize Translation Engine</span>
-      </button>
+      <Button
+        variant="primary"
+        fullWidth
+        size="lg"
+        leadingIcon={<Wand2 size={18} />}
+        className="mt-8 shadow-lg shadow-primary-500/20 font-bold tracking-wide"
+      >
+        Initialize Translation Engine
+      </Button>
     </div>
   );
 }

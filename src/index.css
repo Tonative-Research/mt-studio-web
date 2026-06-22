@@ -1,5 +1,12 @@
 @import 'tailwindcss';
-@plugin "@tailwindcss/forms";
+
+/*
+  strategy: class - the plugin ONLY styles .form-input/.form-select/.form-textarea.
+  Without this, it applies `border-radius: 0` to ALL bare <input> elements at
+  base layer, overriding our .input component class and making fields look unstyled.
+*/
+@plugin "@tailwindcss/forms" { strategy: class }
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ─── Fonts ──────────────────────────────────────────────────────────────── */
@@ -52,7 +59,7 @@
   --font-header: var(--font-cirka), ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-mulish), ui-sans-serif, system-ui, sans-serif;
 
-  /* Primary — deep teal */
+  /* Primary - deep teal */
   --color-primary-50:  oklch(0.955 0.015 220.5);
   --color-primary-100: oklch(0.915 0.028 220.5);
   --color-primary-200: oklch(0.835 0.058 220.5);
@@ -65,7 +72,7 @@
   --color-primary-900: oklch(0.22  0.048 220.5);
   --color-primary-950: oklch(0.15  0.035 220.5);
 
-  /* Accent — warm amber */
+  /* Accent - warm amber */
   --color-accent-50:  oklch(0.975 0.045 70.8);
   --color-accent-100: oklch(0.945 0.08  70.8);
   --color-accent-200: oklch(0.885 0.125 70.8);
@@ -91,10 +98,10 @@
   --color-gray-900: oklch(0.21  0.034 264.665);
   --color-gray-950: oklch(0.13  0.028 261.692);
 
-  /* Surface (light bg for cards, panels) */
+  /* Surface */
   --color-surface: oklch(0.98 0.002 220.5);
 
-  /* Z-index scale */
+  /* Z-index */
   --z-60: 60;
   --z-70: 70;
   --z-80: 80;
@@ -141,16 +148,27 @@
 /* ─── Components ─────────────────────────────────────────────────────────── */
 
 @layer components {
-  /* Card */
+
+  /* ── Cards ── */
+
   .card {
-    @apply bg-white border border-gray-200 shadow-sm rounded-xl p-6;
+    background-color: white;
+    border: 1px solid var(--color-gray-200);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
   }
 
   .glass-card {
-    @apply bg-white/80 backdrop-blur-sm border border-gray-200 shadow-sm rounded-xl;
+    background-color: rgb(255 255 255 / 0.8);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--color-gray-200);
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    border-radius: 0.75rem;
   }
 
-  /* Buttons */
+  /* ── Buttons ── */
+
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg
            bg-primary-500 text-white font-medium text-sm
@@ -179,19 +197,110 @@
            transition-colors duration-150;
   }
 
-  /* Form inputs */
+  /* ── Form inputs - written as raw CSS to guarantee browser rendering ── */
+  /*
+    Do NOT convert these to @apply. The combination of @tailwindcss/forms and
+    Tailwind v4 layer ordering means @apply utilities can be overridden by the
+    plugin's base resets. Raw CSS wins unconditionally.
+  */
+
   .input {
-    @apply block w-full rounded-lg border border-gray-300 bg-white px-3 py-2
-           text-sm text-gray-900 placeholder-gray-400
-           focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500
-           disabled:bg-gray-50 disabled:cursor-not-allowed;
+    display: block;
+    width: 100%;
+    height: 2.75rem;          /* 44px - consistent across all browsers */
+    padding: 0 0.875rem;      /* px-3.5, py-0 */
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--color-gray-900);
+    background-color: #ffffff;
+    border: 1px solid var(--color-gray-200);
+    border-radius: 0.5rem;    /* rounded-lg */
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    outline: none;
+    transition: border-color 150ms, box-shadow 150ms;
+    -webkit-appearance: none;
+    appearance: none;
   }
+
+  .input::placeholder {
+    color: var(--color-gray-400);
+    font-weight: 400;
+  }
+
+  .input:focus {
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px color-mix(in oklch, var(--color-primary-500) 20%, transparent);
+  }
+
+  .input:disabled {
+    background-color: var(--color-gray-50);
+    color: var(--color-gray-400);
+    cursor: not-allowed;
+  }
+
+  /* Textarea - opt out of fixed height, allow vertical resize */
+  textarea.input {
+    height: auto;
+    min-height: 7.5rem;
+    padding: 0.75rem 0.875rem;
+    resize: vertical;
+  }
+
+  /* Select - keep the browser dropdown arrow hidden (we add our own chevron) */
+  select.input {
+    padding-right: 2.5rem;
+    cursor: pointer;
+  }
+
+  .input--error {
+    border-color: var(--color-red-400, #f87171);
+  }
+
+  .input--error:focus {
+    border-color: var(--color-red-500, #ef4444);
+    box-shadow: 0 0 0 3px color-mix(in oklch, #ef4444 20%, transparent);
+  }
+
+  /* ── Labels ── */
 
   .label {
-    @apply block text-sm font-medium text-gray-700 mb-1;
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-gray-700);
+    margin-bottom: 0.375rem;
+    line-height: 1;
   }
 
-  /* Drop zone */
+  .label--required::after {
+    content: ' *';
+    color: var(--color-red-500, #ef4444);
+    font-weight: 400;
+  }
+
+  /* ── Field feedback ── */
+
+  .field-error {
+    margin-top: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-red-600, #dc2626);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    line-height: 1;
+  }
+
+  .field-hint {
+    margin-top: 0.375rem;
+    font-size: 0.75rem;
+    color: var(--color-gray-400);
+    line-height: 1.375;
+  }
+
+  /* ── Drop zone ── */
+
   .drop-zone {
     @apply flex flex-col items-center justify-center
            border-2 border-dashed border-gray-300 rounded-xl p-10
@@ -204,7 +313,8 @@
     @apply border-primary-500 bg-primary-50 text-primary-600;
   }
 
-  /* Progress bar */
+  /* ── Progress bar ── */
+
   .progress-track {
     @apply w-full bg-gray-200 rounded-full h-2 overflow-hidden;
   }
@@ -213,25 +323,59 @@
     @apply h-2 rounded-full bg-primary-500 transition-all duration-300 ease-out;
   }
 
-  /* Badge */
+  /* ── Badges - each class is fully self-contained (no @apply chaining) ── */
+
   .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-  }
-
-  .badge-success {
-    @apply badge bg-green-100 text-green-700;
-  }
-
-  .badge-warning {
-    @apply badge bg-amber-100 text-amber-700;
-  }
-
-  .badge-error {
-    @apply badge bg-red-100 text-red-700;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
   }
 
   .badge-info {
-    @apply badge bg-primary-100 text-primary-700;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background-color: var(--color-primary-100);
+    color: var(--color-primary-700);
+  }
+
+  .badge-success {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background-color: #dcfce7;
+    color: #15803d;
+  }
+
+  .badge-warning {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background-color: #fef3c7;
+    color: #b45309;
+  }
+
+  .badge-error {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background-color: #fee2e2;
+    color: #b91c1c;
   }
 }
 

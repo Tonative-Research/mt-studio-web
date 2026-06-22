@@ -1,0 +1,14 @@
+# #!/usr/bin/env sh
+# . "$(dirname "$0")/_/husky.sh"
+
+echo ""
+echo "Running pre-push build check..."
+echo ""
+
+# Full production build. It catches CSS errors, tree-shaking issues,
+# and anything that compiles locally but breaks in production mode.
+npm run build
+
+echo ""
+echo "Build passed. Pushing..."
+echo ""

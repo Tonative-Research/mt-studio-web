@@ -1,17 +1,18 @@
-import { Bell, User } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+import { Bell, User } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Button } from '@/components/common/Button';
 
 const navItems = [
-  { label: "Dashboard", to: "/dashboard" },
-  { label: "History", to: "/dashboard/history" },
-  { label: "Settings", to: "/dashboard/settings" },
+  { label: 'Dashboard', to: '/dashboard' },
+  { label: 'History', to: '/dashboard/history' },
+  { label: 'Settings', to: '/dashboard/settings' },
 ];
 
 export default function AppHeader() {
   const { pathname } = useLocation();
 
   return (
-    <header className="h-16 bg-primary-900 border-b border-white/10 px-4 sm:px-8 flex items-center sticky top-0 z-30 gap-6">
+    <header className="h-16 bg-primary-800 border-b border-white/10 px-4 sm:px-8 flex items-center sticky top-0 z-30 gap-6">
       {/* Brand */}
       <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
         <img
@@ -28,7 +29,10 @@ export default function AppHeader() {
       </Link>
 
       {/* Nav tabs */}
-      <nav className="hidden sm:flex items-center h-16 gap-1">
+      <nav
+        className="hidden sm:flex items-center h-16 gap-1"
+        aria-label="Main navigation"
+      >
         {navItems.map(({ label, to }) => {
           const active =
             pathname === to || (to !== "/dashboard" && pathname.startsWith(to));
@@ -53,17 +57,24 @@ export default function AppHeader() {
 
       {/* Right actions */}
       <div className="ml-auto flex items-center gap-2">
-        <button className="hidden sm:flex btn-accent text-xs text-white uppercase tracking-widest px-5 py-2">
+        <Button
+          variant="accent"
+          size="sm"
+          className="hidden sm:flex font-black uppercase tracking-widest"
+        >
           New Session
-        </button>
+        </Button>
+
         <div className="hidden sm:block h-6 w-px bg-white/10 mx-1" />
+
         <button
           className="p-2 text-white/60 hover:bg-white/10 rounded-full transition-colors relative"
           aria-label="Notifications"
         >
           <Bell size={19} />
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent-500 rounded-full border-2 border-primary-500" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent-500 rounded-full border-2 border-primary-800" />
         </button>
+
         <button
           className="p-2 text-white/60 hover:bg-white/10 rounded-full transition-colors"
           aria-label="Account"

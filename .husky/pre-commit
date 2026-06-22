@@ -1,0 +1,18 @@
+# #!/usr/bin/env sh
+# . "$(dirname "$0")/_/husky.sh"
+
+echo ""
+echo "Running pre-commit checks..."
+echo ""
+
+# 1. README rule enforcement (imports, CSS, Redux hooks, env files, services)
+node scripts/check-all.mjs
+
+# 2. TypeScript — full project check across all src/ files
+#    Note: tsc -p cannot be run per-file by lint-staged (TS5042), so it runs
+#    here as a whole-project check instead.
+echo "Running TypeScript check..."
+npm run lint
+
+# 3. lint-staged — runs per-file checks on staged files only (CSS rules)
+npx lint-staged

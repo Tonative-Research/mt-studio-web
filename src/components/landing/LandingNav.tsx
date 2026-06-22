@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from "react-router-dom";
 import { Menu, X } from 'lucide-react';
+import { Button } from "@/components/common/Button";
 
 export default function LandingNav() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -32,7 +34,7 @@ export default function LandingNav() {
           </span>
         </Link>
 
-        {/* Desktop links */}
+        {/* Desktop anchor links */}
         <div className="hidden sm:flex items-center gap-7 ml-4">
           <a
             href="#how-it-works"
@@ -50,12 +52,16 @@ export default function LandingNav() {
 
         {/* Right */}
         <div className="ml-auto flex items-center gap-3">
-          <Link
-            to="/dashboard"
-            className="hidden sm:flex btn-accent text-xs text-white uppercase tracking-widest px-5 py-2.5"
-          >
-            Launch App
-          </Link>
+          <div className="hidden sm:block" >
+              <Button
+                variant="accent"
+                size="sm"
+                className="hidden sm:flex font-black uppercase tracking-widest"
+                onClick={() => navigate("/dashboard")}
+              >
+                Launch App
+              </Button>
+              </div>
           {/* Mobile hamburger */}
           <button
             onClick={() => setMenuOpen((p) => !p)}
@@ -84,14 +90,18 @@ export default function LandingNav() {
           >
             Languages
           </a>
-          <div className="pt-2 border-t border-white/10">
-            <Link
-              to="/dashboard"
-              onClick={() => setMenuOpen(false)}
-              className="w-full justify-center text-xs text-white uppercase tracking-widest py-3 mt-2"
+          <div className="pt-3 border-t border-white/10">
+            <Button
+              variant="accent"
+              fullWidth
+              className="font-black uppercase tracking-widest"
+              onClick={() => {
+                setMenuOpen(false);
+                navigate("/dashboard");
+              }}
             >
               Launch App
-            </Link>
+            </Button>
           </div>
         </div>
       )}

@@ -1,10 +1,11 @@
 {
-  "name": "Tonative Research",
-  "short_name": "Tonative",
+  "name": "MT Studio by Tonative",
+  "short_name": "MT Studio",
+  "description": "African Language Translation Engine",
   "icons": [
     {
-      "src": "/favicon-32x32.png",
-      "sizes": "96x96",
+      "src": "/static/favicons/favicon-32x32.png",
+      "sizes": "32x32",
       "type": "image/png"
     },
     {
@@ -20,7 +21,8 @@
       "purpose": "maskable"
     }
   ],
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff",
-  "display": "standalone"
+  "theme_color": "#025464",
+  "background_color": "#025464",
+  "display": "standalone",
+  "start_url": "/"
 }

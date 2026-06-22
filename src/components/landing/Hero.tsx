@@ -1,10 +1,10 @@
-import { Link } from "react-router-dom";
 import { motion } from "motion/react";
 import { ArrowRight, Upload } from "lucide-react";
+import { Button } from "@/components/common/Button";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden bg-primary-900 min-h-[92vh] flex items-center">
+    <section className="relative overflow-hidden bg-primary-800 min-h-[92vh] flex items-center">
       {/* Subtle grid texture */}
       <div
         className="absolute inset-0 opacity-[0.04]"
@@ -33,7 +33,7 @@ export default function Hero() {
             <span className="text-accent-400">into African languages.</span>
           </motion.h1>
 
-          {/* Sub */}
+          {/* Subheading */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -51,16 +51,16 @@ export default function Hero() {
             transition={{ duration: 0.55, delay: 0.24 }}
             className="flex flex-wrap items-center gap-4"
           >
-            <Link
-              to="/dashboard"
-              className="bg-gray-200 px-7 py-3.5 text-sm font-black uppercase tracking-widest shadow-xl shadow-accent-500/25 group"
+            <Button
+              variant="secondary"
+              size="lg"
+              trailingIcon={<ArrowRight size={16} />}
+              className="shadow-xl shadow-accent-500/25 font-black uppercase tracking-widest"
+              onClick={() => (window.location.href = "/dashboard")}
             >
               Start Translating
-              <ArrowRight
-                size={16}
-                className="group-hover:translate-x-1 transition-transform"
-              />
-            </Link>
+            </Button>
+
             <a
               href="#how-it-works"
               className="inline-flex items-center gap-2 text-sm font-semibold text-white/50 hover:text-white transition-colors"

@@ -1,4 +1,5 @@
 import { Download, Cloud } from 'lucide-react';
+import { Button } from '@/components/common/Button';
 
 const mockData = [
   { id: '#001', original: 'Welcome to the digital marketplace.', translated: 'Kaabo si oja oni-nọmba.' },
@@ -12,18 +13,24 @@ export default function PreviewTable() {
       <div className="px-6 lg:px-8 py-5 flex items-center justify-between border-b border-gray-100 bg-white">
         <div className="flex items-center gap-3">
           <Cloud className="text-gray-400" size={20} />
-          <h3 className="font-bold text-lg tracking-tight text-gray-900">Output Preview</h3>
+          <h3 className="font-bold text-lg tracking-tight text-gray-900">
+            Output Preview
+          </h3>
         </div>
-        <button className="btn-accent text-xs font-black uppercase tracking-[0.15em] px-5 py-2.5 shadow-lg shadow-accent-500/20">
-          <Download size={14} />
+        <Button
+          variant="accent"
+          size="sm"
+          leadingIcon={<Download size={14} />}
+          className="font-black uppercase tracking-[0.15em] shadow-lg shadow-accent-500/20"
+        >
           Download CSV
-        </button>
+        </Button>
       </div>
 
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-primary-500 text-white">
+            <tr className="bg-primary-800 text-white">
               <th className="px-6 lg:px-8 py-4 text-[10px] font-black uppercase tracking-widest border-r border-white/10 w-20">
                 Row
               </th>
@@ -53,9 +60,13 @@ export default function PreviewTable() {
         </table>
       </div>
 
-      <button className="w-full py-4 bg-gray-50 text-[10px] font-black uppercase tracking-widest text-primary-500 hover:bg-gray-100 transition-colors border-t border-gray-100">
+      <Button
+        variant="ghost"
+        fullWidth
+        className="rounded-none border-t border-gray-100 text-[10px] font-black uppercase tracking-widest text-primary-500 hover:text-primary-600 py-4 h-auto"
+      >
         View all rows
-      </button>
+      </Button>
     </div>
   );
 }
