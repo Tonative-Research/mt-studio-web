@@ -4,9 +4,9 @@ type SkeletonVariant = 'line' | 'circle' | 'card' | 'button';
 
 interface SkeletonProps {
   variant?: SkeletonVariant;
-  /** For 'line' — controls width (e.g. 'w-1/2', 'w-full') */
+  /** For 'line' - controls width (e.g. 'w-1/2', 'w-full') */
   width?: string;
-  /** For 'line' — controls height (e.g. 'h-4') */
+  /** For 'line' - controls height (e.g. 'h-4') */
   height?: string;
   /** Number of line repetitions */
   lines?: number;
@@ -22,45 +22,41 @@ export function Skeleton({
   lines = 1,
   className,
 }: SkeletonProps) {
-  if (variant === 'circle') {
+  if (variant === "circle") {
     return (
       <span
         aria-hidden="true"
-        className={cn(base, 'rounded-full', width, height, className)}
+        className={cn(base, "rounded-full", width, height, className)}
       />
     );
   }
 
-  if (variant === 'card') {
+  if (variant === "card") {
     return (
       <div
         aria-hidden="true"
-        className={cn(base, 'rounded-xl w-full h-36', className)}
+        className={cn(base, "rounded-xl w-full h-36", className)}
       />
     );
   }
 
-  if (variant === 'button') {
+  if (variant === "button") {
     return (
       <span
         aria-hidden="true"
-        className={cn(base, 'rounded-lg h-10 w-28 inline-block', className)}
+        className={cn(base, "rounded-lg h-10 w-28 inline-block", className)}
       />
     );
   }
 
-  // 'line' — supports multiple lines with the last one narrower for realism
+  // 'line' - supports multiple lines with the last one narrower for realism
   if (lines > 1) {
     return (
-      <div aria-hidden="true" className={cn('flex flex-col gap-2', className)}>
+      <div aria-hidden="true" className={cn("flex flex-col gap-2", className)}>
         {Array.from({ length: lines }).map((_, i) => (
           <span
             key={i}
-            className={cn(
-              base,
-              height,
-              i === lines - 1 ? 'w-3/4' : width,
-            )}
+            className={cn(base, height, i === lines - 1 ? "w-3/4" : width)}
           />
         ))}
       </div>
@@ -68,9 +64,6 @@ export function Skeleton({
   }
 
   return (
-    <span
-      aria-hidden="true"
-      className={cn(base, height, width, className)}
-    />
+    <span aria-hidden="true" className={cn(base, height, width, className)} />
   );
 }

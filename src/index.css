@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 /*
-  strategy: class — the plugin ONLY styles .form-input/.form-select/.form-textarea.
+  strategy: class - the plugin ONLY styles .form-input/.form-select/.form-textarea.
   Without this, it applies `border-radius: 0` to ALL bare <input> elements at
   base layer, overriding our .input component class and making fields look unstyled.
 */
@@ -59,7 +59,7 @@
   --font-header: var(--font-cirka), ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-mulish), ui-sans-serif, system-ui, sans-serif;
 
-  /* Primary — deep teal */
+  /* Primary - deep teal */
   --color-primary-50:  oklch(0.955 0.015 220.5);
   --color-primary-100: oklch(0.915 0.028 220.5);
   --color-primary-200: oklch(0.835 0.058 220.5);
@@ -72,7 +72,7 @@
   --color-primary-900: oklch(0.22  0.048 220.5);
   --color-primary-950: oklch(0.15  0.035 220.5);
 
-  /* Accent — warm amber */
+  /* Accent - warm amber */
   --color-accent-50:  oklch(0.975 0.045 70.8);
   --color-accent-100: oklch(0.945 0.08  70.8);
   --color-accent-200: oklch(0.885 0.125 70.8);
@@ -197,7 +197,7 @@
            transition-colors duration-150;
   }
 
-  /* ── Form inputs — written as raw CSS to guarantee browser rendering ── */
+  /* ── Form inputs - written as raw CSS to guarantee browser rendering ── */
   /*
     Do NOT convert these to @apply. The combination of @tailwindcss/forms and
     Tailwind v4 layer ordering means @apply utilities can be overridden by the
@@ -207,7 +207,7 @@
   .input {
     display: block;
     width: 100%;
-    height: 2.75rem;          /* 44px — consistent across all browsers */
+    height: 2.75rem;          /* 44px - consistent across all browsers */
     padding: 0 0.875rem;      /* px-3.5, py-0 */
     font-size: 0.875rem;
     font-weight: 500;
@@ -239,7 +239,7 @@
     cursor: not-allowed;
   }
 
-  /* Textarea — opt out of fixed height, allow vertical resize */
+  /* Textarea - opt out of fixed height, allow vertical resize */
   textarea.input {
     height: auto;
     min-height: 7.5rem;
@@ -247,7 +247,7 @@
     resize: vertical;
   }
 
-  /* Select — keep the browser dropdown arrow hidden (we add our own chevron) */
+  /* Select - keep the browser dropdown arrow hidden (we add our own chevron) */
   select.input {
     padding-right: 2.5rem;
     cursor: pointer;
@@ -323,7 +323,7 @@
     @apply h-2 rounded-full bg-primary-500 transition-all duration-300 ease-out;
   }
 
-  /* ── Badges — each class is fully self-contained (no @apply chaining) ── */
+  /* ── Badges - each class is fully self-contained (no @apply chaining) ── */
 
   .badge {
     display: inline-flex;

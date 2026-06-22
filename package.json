@@ -8,7 +8,14 @@
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit -p tsconfig.app.json",
+    "check": "node scripts/check-all.mjs",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "src/index.css": [
+      "node scripts/check-css-rules.mjs"
+    ]
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
@@ -39,6 +46,8 @@
     "@types/react": "^19.2.17",
     "autoprefixer": "^10.4.21",
     "esbuild": "^0.25.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",

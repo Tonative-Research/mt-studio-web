@@ -1,0 +1,34 @@
+{
+  // Tell VS Code's TypeScript server to use the workspace's own TypeScript
+  // instead of the built-in version. This ensures tsconfig.app.json is
+  // resolved correctly and JSX errors from stale configs don't appear.
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+
+  // Explicitly point the TS server at tsconfig.app.json so it never
+  // falls back to an implicit config that lacks "jsx": "react-jsx".
+  "typescript.tsserver.experimental.enableProjectDiagnostics": false,
+
+  // Editor quality-of-life
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "never"
+  },
+  "editor.defaultFormatter": null,
+
+  // File associations
+  "files.associations": {
+    "*.css": "css"
+  },
+
+  // Exclude noise from explorer and search
+  "files.exclude": {
+    "node_modules": true,
+    "dist": true
+  },
+  "search.exclude": {
+    "node_modules": true,
+    "dist": true,
+    "package-lock.json": true
+  }
+}

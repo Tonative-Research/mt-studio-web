@@ -82,7 +82,7 @@ export default function Hero() {
             { value: "500+", label: "African languages targeted" },
             { value: "Gemini", label: "1.5 Flash & Pro supported" },
             { value: "CSV", label: "drag-and-drop upload" },
-            { value: "Open", label: "source — contribute soon" },
+            { value: "Open", label: "source - contribute soon" },
           ].map(({ value, label }) => (
             <div key={label}>
               <p className="text-2xl font-black text-white">{value}</p>

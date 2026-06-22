@@ -8,7 +8,7 @@ export { Badge } from '@/components/common/Badge';
 
 export { Skeleton } from '@/components/common/Skeleton';
 
-// Form fields — designed to work with React Hook Form + Zod
+// Form fields - designed to work with React Hook Form + Zod
 export { TextInput } from '@/components/common/TextInput';
 export type { TextInputProps } from '@/components/common/TextInput';
 

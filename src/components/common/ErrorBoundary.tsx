@@ -3,7 +3,7 @@ import { RefreshCw, AlertTriangle } from 'lucide-react';
 
 interface Props {
   children: ReactNode;
-  /** Custom fallback UI — receives the error and a reset function */
+  /** Custom fallback UI - receives the error and a reset function */
   fallback?: (error: Error, reset: () => void) => ReactNode;
 }
 
