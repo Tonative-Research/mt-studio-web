@@ -1,0 +1,5 @@
+{
+  "name": "Tonative MT Studio",
+  "description": "Linguistic infrastructure for large-scale dataset translations across high-performance LLMs.",
+  "requestFramePermissions": []
+}

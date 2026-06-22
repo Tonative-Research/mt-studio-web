@@ -1,0 +1,54 @@
+
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <title>Tonative</title>
+      <link>https://tonative.org//blog</link>
+      <description>Tonative is a community-driven initiative focused on AI data curation for under-resourced languages in Africa, combining human expertise and AI tools to build ethical language datasets</description>
+      <language>en-us</language>
+      <managingEditor>services@tonative.org (Tonative Team)</managingEditor>
+      <webMaster>services@tonative.org (Tonative Team)</webMaster>
+      <lastBuildDate>Mon, 20 Apr 2026 00:00:00 GMT</lastBuildDate>
+      <atom:link href="https://tonative.org//feed.xml" rel="self" type="application/rss+xml"/>
+      
+  <item>
+    <guid>https://tonative.org//blog/2026-04-26-tonative-data-academy</guid>
+    <title>Launching the African Language Data Curation Program</title>
+    <link>https://tonative.org//blog/2026-04-26-tonative-data-academy</link>
+    <description>A look back at our 6-week intensive pilot program designed to bridge the gap between African linguistics and AI technology.</description>
+    <pubDate>Mon, 20 Apr 2026 00:00:00 GMT</pubDate>
+    <author>services@tonative.org (Tonative Team)</author>
+    <category>education</category><category>academy</category><category>data-curation</category><category>pilot</category>
+  </item>
+
+  <item>
+    <guid>https://tonative.org//blog/2025-12-19-report</guid>
+    <title>2025 Report</title>
+    <link>https://tonative.org//blog/2025-12-19-report</link>
+    <description>How we grew from a March 2025 idea into a language infrastructure company with 51,000+ validated African sentences.</description>
+    <pubDate>Fri, 19 Dec 2025 00:00:00 GMT</pubDate>
+    <author>services@tonative.org (Tonative Team)</author>
+    <category>article</category><category>story</category><category>organisation</category><category>annual-report</category>
+  </item>
+
+  <item>
+    <guid>https://tonative.org//blog/2025-10-28-evaluating-physical-commonsense-reasoning</guid>
+    <title>Global PIQA: Testing AI with Local Culture</title>
+    <link>https://tonative.org//blog/2025-10-28-evaluating-physical-commonsense-reasoning</link>
+    <description>We helped build a global benchmark to test how well AI understands everyday physical knowledge across 100 languages.</description>
+    <pubDate>Tue, 28 Oct 2025 00:00:00 GMT</pubDate>
+    <author>services@tonative.org (Tonative Team)</author>
+    <category>research paper</category><category>AI</category><category>commonsense</category><category>culture</category>
+  </item>
+
+  <item>
+    <guid>https://tonative.org//blog/2025-09-22-scaling-african-language-datasets</guid>
+    <title>Scaling African Language Datasets</title>
+    <link>https://tonative.org//blog/2025-09-22-scaling-african-language-datasets</link>
+    <description>How Tonative uses human-AI collaboration to grow language resources for low-resource African languages.</description>
+    <pubDate>Mon, 22 Sep 2025 00:00:00 GMT</pubDate>
+    <author>services@tonative.org (Tonative Team)</author>
+    <category>research paper</category><category>datasets</category><category>AI</category><category>community</category><category>NLP</category>
+  </item>
+
+    </channel>
+  </rss>
