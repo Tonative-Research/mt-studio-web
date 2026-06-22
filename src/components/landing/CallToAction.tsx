@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
-import { motion } from "motion/react";
-import { ArrowRight } from "lucide-react";
+import { motion } from 'motion/react';
+import { ArrowRight } from 'lucide-react';
+import { Button } from '@/components/common/Button';
 
 export default function CallToAction() {
   return (
@@ -28,16 +28,15 @@ export default function CallToAction() {
             let Gemini do the work.
           </p>
 
-          <Link
-            to="/dashboard"
-            className="bg-gray-200 inline-flex px-8 py-4 text-sm font-black uppercase tracking-widest shadow-2xl shadow-accent-500/30 group"
+          <Button
+            variant="accent"
+            size="lg"
+            trailingIcon={<ArrowRight size={16} />}
+            className="shadow-2xl shadow-accent-500/30 font-black uppercase tracking-widest"
+            onClick={() => window.location.href = '/dashboard'}
           >
             Open MT Studio
-            <ArrowRight
-              size={16}
-              className="group-hover:translate-x-1 transition-transform"
-            />
-          </Link>
+          </Button>
         </motion.div>
       </div>
     </section>

@@ -18,6 +18,7 @@ import accountReducer from '@/redux/accountSlice';
 import translateReducer from '@/redux/translateSlice';
 import uploadReducer from '@/redux/uploadSlice';
 import modelConfigReducer from '@/redux/modelConfigSlice';
+import toastReducer from '@/redux/toastSlice';
 
 const persistConfig = {
   key: 'root',
@@ -32,6 +33,7 @@ const rootReducer = combineReducers({
   translate: translateReducer,
   upload: uploadReducer,
   modelConfig: modelConfigReducer,
+  toast: toastReducer,
   [baseApi.reducerPath]: baseApi.reducer,
 });
 
