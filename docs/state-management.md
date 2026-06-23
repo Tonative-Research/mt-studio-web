@@ -17,7 +17,7 @@ MTStudio uses **Redux Toolkit** for global client state and **RTK Query** (bundl
 | `app`         | `appSlice.ts`         | App-wide UI state (sidebar visibility, search)          |
 | `auth`        | `authSlice.ts`        | Auth token, decoded JWT claims, user identity           |
 | `account`     | `accountSlice.ts`     | Logged-in user profile                                  |
-| `translate`   | `translateSlice.ts`   | Active translation job, progress, status                |
+| `translate`   | `translateSlice.ts`   | Active translation job, progress, status — also writes to `localStorage` via `sessionStorage.ts` |
 | `upload`      | `uploadSlice.ts`      | Uploaded file, CSV columns, language selections         |
 | `modelConfig` | `modelConfigSlice.ts` | Available Gemini models and the selected model          |
 | `toast`       | `toastSlice.ts`       | Notification queue — see [dev-tools.md](./dev-tools.md) |
@@ -99,3 +99,49 @@ export const { useGetMyDataQuery, useUpdateMyDataMutation } = myFeatureApi;
 ```
 
 **Rule:** Don't dispatch Redux actions from service files. Service files only define RTK Query endpoints. Dispatch only from components or custom hooks.
+
+---
+
+## Session History (localStorage)
+
+Translation sessions are persisted to `localStorage` as a workaround until account authentication and backend history storage are implemented. This allows users to see past jobs when they return to the same browser.
+
+### How it works
+
+- **`setCurrentJob`** in `translateSlice` calls `saveSession(job)` every time a job is created or updated — this upserts a record into `localStorage` under the key `mtstudio_sessions`.
+- **`setJobStatus`** calls `updateSessionStatus(sessionId, status)` to keep the stored status in sync as the job progresses.
+- **`resetTranslateState`** (triggered by the "New Session" button) clears Redux state and reloads the page — it does **not** clear `localStorage`, so history is preserved across sessions.
+
+### Utility API (`src/utils/sessionStorage.ts`)
+
+```ts
+import { getSessions, saveSession, updateSessionStatus } from '@/utils/sessionStorage';
+
+// Read all sessions (newest first)
+const sessions: ISessionRecord[] = getSessions();
+
+// Persist a job (called automatically by translateSlice)
+saveSession(job: ITranslationJob): void
+
+// Update status on an existing record (called automatically by translateSlice)
+updateSessionStatus(sessionId: string, status: string): void
+```
+
+### `ISessionRecord` shape
+
+```ts
+interface ISessionRecord {
+  sessionId: string;       // matches ITranslationJob.id
+  fileName: string;
+  sourceLanguage: string;
+  targetLanguage: string;
+  status: string;          // ETranslationStatus value
+  createdAt: string;       // ISO 8601 string
+}
+```
+
+### History page
+
+`/dashboard/history` (`src/pages/HistoryPage.tsx`) reads from `getSessions()` and renders the full list. Each row is expandable to show the session ID (needed for status polling once that is wired up), both languages, status badge, and timestamp.
+
+> **Future:** when email collection or auth is added, session records should be migrated to the backend and `localStorage` used only as a cache.

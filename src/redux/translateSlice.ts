@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ITranslationJob, ETranslationStatus } from '@/services/types/translate';
+import { saveSession, updateSessionStatus } from '@/utils/sessionStorage';
 
 interface TranslateState {
   currentJob: ITranslationJob | null;
@@ -25,9 +26,13 @@ const translateSlice = createSlice({
   reducers: {
     setCurrentJob: (state, action: PayloadAction<ITranslationJob>) => {
       state.currentJob = action.payload;
+      saveSession(action.payload);
     },
     setJobStatus: (state, action: PayloadAction<ETranslationStatus>) => {
       state.jobStatus = action.payload;
+      if (state.currentJob) {
+        updateSessionStatus(state.currentJob.id, action.payload);
+      }
     },
     setProgress: (
       state,

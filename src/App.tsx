@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import LandingPage from '@/pages/LandingPage';
 import DashboardPage from '@/pages/DashboardPage';
+import HistoryPage from '@/pages/HistoryPage';
 
 const isDev = import.meta.env.DEV;
 
@@ -17,6 +18,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/dashboard/history" element={<HistoryPage />} />
           {isDev && ComponentShowcasePage && (
             <Route path="/dev/components" element={<ComponentShowcasePage />} />
           )}

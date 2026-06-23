@@ -12,6 +12,7 @@ src/
 ├── pages/                           # One file per route (thin shells — compose, don't compute)
 │   ├── LandingPage.tsx              # Route: /
 │   ├── DashboardPage.tsx            # Route: /dashboard
+│   ├── HistoryPage.tsx              # Route: /dashboard/history
 │   └── ComponentShowcasePage.tsx    # Route: /dev/components (dev only)
 │
 ├── components/
@@ -41,6 +42,7 @@ src/
 │       ├── Dashboard.tsx
 │       ├── UploadZone.tsx
 │       ├── EngineConfigForm.tsx
+│       ├── HistoryContent.tsx       # Session history list with expandable detail rows
 │       └── PreviewTable.tsx
 │
 ├── providers/
@@ -74,7 +76,8 @@ src/
 │       └── model.ts
 │
 ├── utils/
-│   └── cn.ts                        # Class name merge utility
+│   ├── cn.ts                        # Class name merge utility
+│   └── sessionStorage.ts            # localStorage helpers for session history (getSessions, saveSession, updateSessionStatus)
 │
 └── scripts/                         # Pre-commit enforcement scripts
     ├── check-all.mjs
@@ -92,6 +95,7 @@ Routes are defined in `src/App.tsx` using React Router v7. The router outlet is 
 ```
 /                   → pages/LandingPage.tsx       public marketing page
 /dashboard          → pages/DashboardPage.tsx      app (no auth gate yet)
+/dashboard/history  → pages/HistoryPage.tsx         session history (localStorage-backed)
 /dev/components     → ComponentShowcasePage.tsx    dev only — never in production
 ```
 

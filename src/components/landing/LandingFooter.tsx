@@ -23,7 +23,7 @@ export default function LandingFooter() {
           to="/dashboard"
           className="text-xs font-semibold text-white hover:text-white/60 transition-colors"
         >
-          Launch App →
+          {/* Go to Dashboard → */}
         </Link>
       </div>
     </footer>

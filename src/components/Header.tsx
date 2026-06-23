@@ -1,6 +1,8 @@
 import { Bell, User } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/common/Button';
+import { resetTranslateState } from '@/redux/translateSlice';
+import { useAppDispatch } from '@/redux/hooks';
 
 const navItems = [
   { label: 'Dashboard', to: '/dashboard' },
@@ -10,6 +12,12 @@ const navItems = [
 
 export default function AppHeader() {
   const { pathname } = useLocation();
+  const dispatch = useAppDispatch();
+
+  function handleNewSession() {
+    dispatch(resetTranslateState());
+    window.location.reload();
+  }
 
   return (
     <header className="h-16 bg-primary-800 border-b border-white/10 px-4 sm:px-8 flex items-center sticky top-0 z-30 gap-6">
@@ -61,6 +69,7 @@ export default function AppHeader() {
           variant="accent"
           size="sm"
           className="hidden sm:flex font-black uppercase tracking-widest"
+          onClick={handleNewSession}
         >
           New Session
         </Button>

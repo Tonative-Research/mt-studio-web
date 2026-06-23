@@ -3,12 +3,25 @@ import { Button } from '@/components/common/Button';
 import { Select } from '@/components/common/Select';
 
 const languageOptions = [
-  { value: 'en-US', label: 'English (US)' },
-  { value: 'yo-NG', label: 'Yoruba (Nigeria)' },
-  { value: 'sw-TZ', label: 'Swahili (East Africa)' },
-  { value: 'ha-NG', label: 'Hausa (Nigeria)' },
-  { value: 'ig-NG', label: 'Igbo (Nigeria)' },
-  { value: 'fr-FR', label: 'French' },
+  { value: 'en', label: 'English' },
+  { value: 'fr', label: 'French' },
+  { value: 'ln', label: 'Lingala' },
+  { value: 'luo', label: 'Luo' },
+  { value: 'ki', label: 'Kikuyu' },
+  { value: 'mas', label: 'Maasai' },
+  { value: 'sw', label: 'Swahili' },
+  { value: 'ny', label: 'Chichewa' },
+  { value: 'efi', label: 'Efik' },
+  { value: 'ff', label: 'Fula' },
+  { value: 'ha', label: 'Hausa' },
+  { value: 'ibb', label: 'Ibibio' },
+  { value: 'ig', label: 'Igbo' },
+  { value: 'kr', label: 'Kanuri' },
+  { value: 'pcm', label: 'Nigerian Pidgin' },
+  { value: 'yo', label: 'Yoruba' },
+  { value: 'rw', label: 'Kinyarwanda' },
+  { value: 'lg', label: 'Luganda' },
+  { value: 'xog', label: 'Lusoga' },
 ];
 
 const columnOptions = [
@@ -36,12 +49,12 @@ export default function EngineConfigForm() {
         <Select
           label="Source Language"
           options={languageOptions}
-          defaultValue="en-US"
+          defaultValue="en"
         />
         <Select
           label="Target Language"
           options={languageOptions}
-          defaultValue="yo-NG"
+          defaultValue="yo"
         />
         <Select
           label="Column for Translation"
