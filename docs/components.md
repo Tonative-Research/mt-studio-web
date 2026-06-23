@@ -137,9 +137,9 @@ Extra props: `showCount` (requires `maxLength`), `containerClassName`.
   required
   placeholder="Choose a language…"
   options={[
-    { value: 'yo-NG', label: 'Yoruba (Nigeria)' },
-    { value: 'sw-TZ', label: 'Swahili (East Africa)' },
-    { value: 'ha-NG', label: 'Hausa (Nigeria)', disabled: true },
+    { value: 'yo', label: 'Yoruba' },
+    { value: 'sw', label: 'Swahili' },
+    { value: 'ha', label: 'Hausa', disabled: true },
   ]}
   error={errors.language}
 />
@@ -236,3 +236,24 @@ Use it around any high-risk subtree with a custom fallback:
   <SomeFeature />
 </ErrorBoundary>
 ```
+
+---
+
+## HistoryContent
+
+Renders the full session history list on `/dashboard/history`. Reads sessions from `localStorage` via `getSessions()` — no props required.
+
+```tsx
+import HistoryContent from '@/components/dashboard/HistoryContent';
+
+<HistoryContent />
+```
+
+Each row displays:
+- File name and source → target language pair
+- Status badge (colour-coded: green = Completed, blue = Processing, amber = Pending, red = Failed)
+- Timestamp of when the job was started
+
+Clicking a row expands a detail panel showing the session ID, both language codes, status, and full date/time. The session ID is the hook for future status polling via `getTranslationStatus(sessionId)`.
+
+When `localStorage` is empty, an empty state is shown prompting the user to run their first translation.

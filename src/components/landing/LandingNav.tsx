@@ -59,7 +59,7 @@ export default function LandingNav() {
                 className="hidden sm:flex font-black uppercase tracking-widest"
                 onClick={() => navigate("/dashboard")}
               >
-                Launch App
+                Go to Dashboard
               </Button>
               </div>
           {/* Mobile hamburger */}
@@ -100,7 +100,7 @@ export default function LandingNav() {
                 navigate("/dashboard");
               }}
             >
-              Launch App
+              Go to Dashboard
             </Button>
           </div>
         </div>

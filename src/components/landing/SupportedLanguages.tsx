@@ -1,18 +1,25 @@
 import { motion } from 'motion/react';
 
 const languages = [
-  { name: 'Yoruba', region: 'Nigeria', code: 'yo' },
-  { name: 'Hausa', region: 'Nigeria / Niger', code: 'ha' },
-  { name: 'Igbo', region: 'Nigeria', code: 'ig' },
-  { name: 'Swahili', region: 'East Africa', code: 'sw' },
-  { name: 'Amharic', region: 'Ethiopia', code: 'am' },
-  { name: 'Zulu', region: 'South Africa', code: 'zu' },
-  { name: 'Twi', region: 'Ghana', code: 'tw' },
-  { name: 'Somali', region: 'Somalia / Horn', code: 'so' },
-  { name: 'Wolof', region: 'Senegal', code: 'wo' },
-  { name: 'Shona', region: 'Zimbabwe', code: 'sn' },
+  { name: 'English', region: 'Global', code: 'en' },
+  { name: 'French', region: 'Global / Africa', code: 'fr' },
   { name: 'Lingala', region: 'DRC / Congo', code: 'ln' },
-  { name: 'More coming', region: 'Open source', code: '…' },
+  { name: 'Luo', region: 'Kenya / Uganda', code: 'luo' },
+  { name: 'Kikuyu', region: 'Kenya', code: 'ki' },
+  { name: 'Maasai', region: 'Kenya / Tanzania', code: 'mas' },
+  { name: 'Swahili', region: 'East Africa', code: 'sw' },
+  { name: 'Chichewa', region: 'Malawi / Zambia', code: 'ny' },
+  { name: 'Efik', region: 'Nigeria', code: 'efi' },
+  { name: 'Fula', region: 'West Africa', code: 'ff' },
+  { name: 'Hausa', region: 'Nigeria / Niger', code: 'ha' },
+  { name: 'Ibibio', region: 'Nigeria', code: 'ibb' },
+  { name: 'Igbo', region: 'Nigeria', code: 'ig' },
+  { name: 'Kanuri', region: 'Nigeria / Chad', code: 'kr' },
+  { name: 'Nigerian Pidgin', region: 'Nigeria', code: 'pcm' },
+  { name: 'Yoruba', region: 'Nigeria', code: 'yo' },
+  { name: 'Kinyarwanda', region: 'Rwanda', code: 'rw' },
+  { name: 'Luganda', region: 'Uganda', code: 'lg' },
+  { name: 'Lusoga', region: 'Uganda', code: 'xog' },
 ];
 
 export default function SupportedLanguages() {
