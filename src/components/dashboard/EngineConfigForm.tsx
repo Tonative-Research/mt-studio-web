@@ -1,41 +1,117 @@
+import { useEffect, useMemo, useState } from 'react';
 import { Wand2 } from 'lucide-react';
 import { Button } from '@/components/common/Button';
 import { Select } from '@/components/common/Select';
-
-const languageOptions = [
-  { value: 'en', label: 'English' },
-  { value: 'fr', label: 'French' },
-  { value: 'ln', label: 'Lingala' },
-  { value: 'luo', label: 'Luo' },
-  { value: 'ki', label: 'Kikuyu' },
-  { value: 'mas', label: 'Maasai' },
-  { value: 'sw', label: 'Swahili' },
-  { value: 'ny', label: 'Chichewa' },
-  { value: 'efi', label: 'Efik' },
-  { value: 'ff', label: 'Fula' },
-  { value: 'ha', label: 'Hausa' },
-  { value: 'ibb', label: 'Ibibio' },
-  { value: 'ig', label: 'Igbo' },
-  { value: 'kr', label: 'Kanuri' },
-  { value: 'pcm', label: 'Nigerian Pidgin' },
-  { value: 'yo', label: 'Yoruba' },
-  { value: 'rw', label: 'Kinyarwanda' },
-  { value: 'lg', label: 'Luganda' },
-  { value: 'xog', label: 'Lusoga' },
-];
-
-const columnOptions = [
-  { value: 'text_content', label: 'text_content' },
-  { value: 'description', label: 'description' },
-];
-
-const modelOptions = [
-  { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro' },
-  { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash' },
-  { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash' },
-];
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { setSelectedModel, setAvailableModels } from '@/redux/modelConfigSlice';
+import { setSelectedTextColumn, setSourceLanguage, setTargetLanguage, setAvailableLanguages } from '@/redux/uploadSlice';
+import { setCurrentJob, setJobStatus, setProgress, setTranslateError } from '@/redux/translateSlice';
+import { toast } from '@/redux/toastSlice';
+import { useGetModelsQuery } from '@/services/api/model';
+import { useStartTranslationMutation } from '@/services/api/translate';
+import { ETranslationStatus } from '@/services/types/translate';
+import { saveSession } from '@/utils/sessionStorage';
 
 export default function EngineConfigForm() {
+  const dispatch = useAppDispatch();
+  const uploadedFile = useAppSelector((state) => state.upload.uploadedFile);
+  const columns = useAppSelector((state) => state.upload.columns ?? []);
+  const selectedTextColumn = useAppSelector((state) => state.upload.selectedTextColumn ?? '');
+  const sourceLanguage = useAppSelector((state) => state.upload.sourceLanguage ?? '');
+  const targetLanguage = useAppSelector((state) => state.upload.targetLanguage ?? '');
+  const availableLanguages = useAppSelector((state) => state.upload.availableLanguages ?? []);
+  const selectedModel = useAppSelector((state) => state.modelConfig.selectedModel);
+  const availableModels = useAppSelector((state) => state.modelConfig.availableModels ?? []);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { data: models = [] } = useGetModelsQuery();
+  const [startTranslation] = useStartTranslationMutation();
+
+  useEffect(() => {
+    if (models.length) {
+      dispatch(setAvailableModels(models));
+      if (!selectedModel) {
+        dispatch(setSelectedModel(models[0]));
+      }
+    }
+  }, [dispatch, models, selectedModel]);
+
+  useEffect(() => {
+    if (!availableLanguages.length) {
+      dispatch(setAvailableLanguages([]));
+    }
+  }, [availableLanguages.length, dispatch]);
+
+  const columnOptions = useMemo(
+    () => columns.map((column) => ({ value: column.name, label: column.name })),
+    [columns],
+  );
+
+  const modelOptions = useMemo(
+    () => availableModels.map((model) => ({ value: model.id, label: model.name })),
+    [availableModels],
+  );
+
+  const languageOptions = useMemo(
+    () => availableLanguages,
+    [availableLanguages],
+  );
+
+  const handleSubmit = async () => {
+    const modelToUse = selectedModel ?? availableModels[0];
+
+    if (!uploadedFile) {
+      dispatch(toast.error({ message: 'Please upload a CSV file before initializing translation.' }));
+      return;
+    }
+
+    if (!selectedTextColumn || !sourceLanguage || !targetLanguage || !modelToUse) {
+      dispatch(toast.error({ message: 'Please upload a CSV file and complete all configuration fields.' }));
+      return;
+    }
+
+    setIsSubmitting(true);
+    dispatch(setTranslateError(null));
+    dispatch(setJobStatus(ETranslationStatus.Pending));
+
+    try {
+      const job = await startTranslation({
+        csvBase64: '',
+        fileId: uploadedFile.fileId ?? '',
+        fileName: uploadedFile.name,
+        textColumn: selectedTextColumn,
+        sourceLanguage,
+        targetLanguage,
+        modelId: modelToUse.id,
+      }).unwrap();
+
+      const normalizedJob = {
+        ...job,
+        id: job.id || `${Date.now()}`,
+        fileName: job.fileName || uploadedFile.name,
+        textColumn: job.textColumn || selectedTextColumn,
+        sourceLanguage: job.sourceLanguage || sourceLanguage,
+        targetLanguage: job.targetLanguage || targetLanguage,
+        modelId: job.modelId || modelToUse.id,
+        status: job.status || ETranslationStatus.Pending,
+        createdAt: job.createdAt || new Date().toISOString(),
+      };
+
+      dispatch(setCurrentJob(normalizedJob));
+      dispatch(setProgress({ progress: 0, translatedRows: 0, totalRows: normalizedJob.totalRows || 0 }));
+      dispatch(setJobStatus(normalizedJob.status as ETranslationStatus));
+      saveSession(normalizedJob);
+      dispatch(toast.success({ message: `Translation job started. ID: ${normalizedJob.id}` }));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unable to start translation.';
+      dispatch(setTranslateError(message));
+      dispatch(setJobStatus(ETranslationStatus.Failed));
+      dispatch(toast.error({ message }));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="glass-card p-6 h-full flex flex-col">
       <div className="flex items-center gap-3 mb-6">
@@ -49,22 +125,29 @@ export default function EngineConfigForm() {
         <Select
           label="Source Language"
           options={languageOptions}
-          defaultValue="en"
+          value={sourceLanguage}
+          onChange={(event) => dispatch(setSourceLanguage(event.target.value))}
         />
         <Select
           label="Target Language"
           options={languageOptions}
-          defaultValue="yo"
+          value={targetLanguage}
+          onChange={(event) => dispatch(setTargetLanguage(event.target.value))}
         />
         <Select
           label="Column for Translation"
           options={columnOptions}
-          defaultValue="text_content"
+          value={selectedTextColumn}
+          onChange={(event) => dispatch(setSelectedTextColumn(event.target.value))}
         />
         <Select
           label="Translation Model"
           options={modelOptions}
-          defaultValue="gemini-1.5-flash"
+          value={selectedModel?.id ?? ''}
+          onChange={(event) => {
+            const model = availableModels.find((item) => item.id === event.target.value);
+            if (model) dispatch(setSelectedModel(model));
+          }}
         />
       </div>
 
@@ -72,8 +155,11 @@ export default function EngineConfigForm() {
         variant="primary"
         fullWidth
         size="lg"
+        loading={isSubmitting}
         leadingIcon={<Wand2 size={18} />}
         className="mt-8 shadow-lg shadow-primary-500/20 font-bold tracking-wide"
+        onClick={handleSubmit}
+        disabled={!uploadedFile || isSubmitting}
       >
         Initialize Translation Engine
       </Button>

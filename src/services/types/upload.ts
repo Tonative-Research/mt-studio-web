@@ -4,6 +4,7 @@ export interface IUploadedFile {
   type: string;
   lastModified: number;
   base64: string;
+  fileId?: string;
 }
 
 export interface ICsvColumn {

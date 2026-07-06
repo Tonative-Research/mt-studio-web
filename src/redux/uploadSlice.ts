@@ -1,12 +1,18 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { IUploadedFile, ICsvColumn } from '@/services/types/upload';
 
+interface LanguageOption {
+  value: string;
+  label: string;
+}
+
 interface UploadState {
   uploadedFile: IUploadedFile | null;
   columns: ICsvColumn[];
   selectedTextColumn: string;
   sourceLanguage: string;
   targetLanguage: string;
+  availableLanguages: LanguageOption[];
   previewRows: Record<string, string>[];
 }
 
@@ -16,6 +22,7 @@ const initialState: UploadState = {
   selectedTextColumn: '',
   sourceLanguage: '',
   targetLanguage: '',
+  availableLanguages: [],
   previewRows: [],
 };
 
@@ -38,6 +45,9 @@ const uploadSlice = createSlice({
     setTargetLanguage: (state, action: PayloadAction<string>) => {
       state.targetLanguage = action.payload;
     },
+    setAvailableLanguages: (state, action: PayloadAction<LanguageOption[]>) => {
+      state.availableLanguages = action.payload;
+    },
     setPreviewRows: (state, action: PayloadAction<Record<string, string>[]>) => {
       state.previewRows = action.payload;
     },
@@ -51,6 +61,7 @@ export const {
   setSelectedTextColumn,
   setSourceLanguage,
   setTargetLanguage,
+  setAvailableLanguages,
   setPreviewRows,
   resetUploadState,
 } = uploadSlice.actions;

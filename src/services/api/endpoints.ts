@@ -9,6 +9,9 @@ export const ENDPOINTS = {
   AUTH_RESET_PASSWORD: `${API_PREFIX}/auth/reset-password`,
   AUTH_REFRESH: `${API_PREFIX}/auth/refresh`,
 
+  // Upload
+  UPLOAD_CSV: `${API_PREFIX}/upload/csv`,
+
   // Translation
   TRANSLATE: `${API_PREFIX}/translate`,
   TRANSLATE_STATUS: (jobId: string) =>
