@@ -8,9 +8,25 @@ import { setSelectedTextColumn, setSourceLanguage, setTargetLanguage, setAvailab
 import { setCurrentJob, setJobStatus, setProgress, setTranslateError } from '@/redux/translateSlice';
 import { toast } from '@/redux/toastSlice';
 import { useGetModelsQuery } from '@/services/api/model';
+import { useGetLanguagesQuery } from '@/services/api/language';
 import { useStartTranslationMutation } from '@/services/api/translate';
 import { ETranslationStatus } from '@/services/types/translate';
 import { saveSession } from '@/utils/sessionStorage';
+import type { IGeminiModel } from '@/services/types/model';
+
+const FALLBACK_LANGUAGE_OPTIONS = [
+  { value: 'en', label: 'English' },
+  { value: 'fr', label: 'French' },
+  { value: 'sw', label: 'Swahili' },
+  { value: 'ny', label: 'Chichewa' },
+  { value: 'yo', label: 'Yoruba' },
+];
+
+const FALLBACK_MODEL_OPTIONS = [
+  { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
+  { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' },
+  { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
+];
 
 export default function EngineConfigForm() {
   const dispatch = useAppDispatch();
@@ -25,22 +41,67 @@ export default function EngineConfigForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: models = [] } = useGetModelsQuery();
+  const { data: languages = [] } = useGetLanguagesQuery();
   const [startTranslation] = useStartTranslationMutation();
 
   useEffect(() => {
-    if (models.length) {
-      dispatch(setAvailableModels(models));
-      if (!selectedModel) {
-        dispatch(setSelectedModel(models[0]));
-      }
+    const nextModels = models.length
+      ? models.map((model) => ({
+          id: model.id,
+          name: model.name,
+          description: model.description ?? 'Available translation model',
+          speedLabel: model.speedLabel ?? 'Balanced',
+          qualityLabel: model.qualityLabel ?? 'Good',
+          costLabel: model.costLabel ?? 'Medium',
+          maxTokens: model.maxTokens ?? 4000,
+          isAvailable: model.isAvailable ?? true,
+        }))
+      : FALLBACK_MODEL_OPTIONS.map((model) => ({
+          id: model.id,
+          name: model.name,
+          description: 'Fallback translation model',
+          speedLabel: 'Balanced',
+          qualityLabel: 'Good',
+          costLabel: 'Medium',
+          maxTokens: 4000,
+          isAvailable: true,
+        }));
+
+    const hasSameModels = availableModels.length === nextModels.length
+      && availableModels.every((model, index) => {
+        const candidate = nextModels[index];
+        return candidate && model.id === candidate.id && model.name === candidate.name;
+      });
+
+    if (!hasSameModels) {
+      dispatch(setAvailableModels(nextModels));
     }
-  }, [dispatch, models, selectedModel]);
+
+    if (!selectedModel && nextModels.length) {
+      dispatch(setSelectedModel(nextModels[0]));
+    }
+  }, [dispatch, models, selectedModel, availableModels]);
 
   useEffect(() => {
-    if (!availableLanguages.length) {
-      dispatch(setAvailableLanguages([]));
+    const nextLanguages = languages.length
+      ? languages
+          .map((lang) => ({
+            value: lang.code ?? lang.id ?? '',
+            label: lang.name ?? lang.nativeName ?? lang.code ?? '',
+          }))
+          .filter((lang) => Boolean(lang.value && lang.label))
+      : FALLBACK_LANGUAGE_OPTIONS;
+
+    const hasSameLanguages = availableLanguages.length === nextLanguages.length
+      && availableLanguages.every((language, index) => {
+        const candidate = nextLanguages[index];
+        return candidate && language.value === candidate.value && language.label === candidate.label;
+      });
+
+    if (!hasSameLanguages) {
+      dispatch(setAvailableLanguages(nextLanguages));
     }
-  }, [availableLanguages.length, dispatch]);
+  }, [dispatch, languages, availableLanguages]);
 
   const columnOptions = useMemo(
     () => columns.map((column) => ({ value: column.name, label: column.name })),
@@ -53,7 +114,7 @@ export default function EngineConfigForm() {
   );
 
   const languageOptions = useMemo(
-    () => availableLanguages,
+    () => availableLanguages.length ? availableLanguages : FALLBACK_LANGUAGE_OPTIONS,
     [availableLanguages],
   );
 

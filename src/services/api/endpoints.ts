@@ -1,31 +1,35 @@
 export const BASE_URL = import.meta.env.VITE_REACT_APP_MTSTUDIO_ENDPOINT;
-export const API_PREFIX = "api/v1";
 
 export const ENDPOINTS = {
   // Auth
-  AUTH_LOGIN: `${API_PREFIX}/auth/login`,
-  AUTH_REGISTER: `${API_PREFIX}/auth/register`,
-  AUTH_RESET_PASSWORD_TOKEN: `${API_PREFIX}/auth/reset-password-token`,
-  AUTH_RESET_PASSWORD: `${API_PREFIX}/auth/reset-password`,
-  AUTH_REFRESH: `${API_PREFIX}/auth/refresh`,
+  AUTH_LOGIN: `/auth/login`,
+  AUTH_REGISTER: `/auth/register`,
+  AUTH_RESET_PASSWORD_TOKEN: `/auth/reset-password-token`,
+  AUTH_RESET_PASSWORD: `/auth/reset-password`,
+  AUTH_REFRESH: `/auth/refresh`,
 
   // Upload
-  UPLOAD_CSV: `${API_PREFIX}/upload/csv`,
+  UPLOAD_CSV: `/services/upload/`,
 
   // Translation
-  TRANSLATE: `${API_PREFIX}/translate`,
+  TRANSLATE: `/services/translate/`,
   TRANSLATE_STATUS: (jobId: string) =>
-    `${API_PREFIX}/translate/${jobId}/status`,
+    `/services/translate/translation-status?job_id=${jobId}`,
 
-  // Export
-  EXPORT_CSV: (jobId: string) => `${API_PREFIX}/export/${jobId}/csv`,
+  // Export/Results
+  EXPORT_CSV: (jobId: string) => `/services/results/job/${jobId}/download`,
+  GET_TRANSLATION_RESULT: (jobId: string) => `/services/results/job/${jobId}/result`,
 
   // Models
-  MODELS: `${API_PREFIX}/models`,
+  MODELS: `/services/model/models`,
+  MODEL_BY_ID: (modelId: string) => `/services/model/models/${modelId}`,
+
+  // Languages
+  LANGUAGES: `/services/lang/languages`,
 
   // Account
-  ACCOUNT: `${API_PREFIX}/account`,
-  ACCOUNT_PROFILE: `${API_PREFIX}/account/profile`,
+  ACCOUNT: `/account`,
+  ACCOUNT_PROFILE: `/account/profile`,
 
   // Utility
   COUNTRIES_STATES: "static/countries-states.json",
