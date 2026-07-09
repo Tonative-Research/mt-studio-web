@@ -7,6 +7,9 @@ export interface ISessionRecord {
   fileName: string;
   sourceLanguage: string;
   targetLanguage: string;
+  textColumn?: string;
+  modelId?: string;
+  fileId?: string;
   status: string;
   createdAt: string; // ISO string
 }
@@ -28,6 +31,9 @@ export function saveSession(job: ITranslationJob): void {
       fileName: job.fileName,
       sourceLanguage: job.sourceLanguage,
       targetLanguage: job.targetLanguage,
+      textColumn: job.textColumn,
+      modelId: job.modelId,
+      fileId: job.fileId,
       status: job.status,
       createdAt: job.createdAt ?? new Date().toISOString(),
     };

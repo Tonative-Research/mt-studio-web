@@ -7,13 +7,13 @@ export enum ETranslationStatus {
 }
 
 export interface ITranslateRequest {
-  jobId?: string;
-  csvBase64: string;
-  fileName: string;
-  textColumn: string;
   sourceLanguage: string;
   targetLanguage: string;
+  inferenceMode?: string;
   modelId: string;
+  fileId: string;
+  email?: string;
+  targetColumnIndex: number;
 }
 
 export interface ITranslationJob {
@@ -23,6 +23,7 @@ export interface ITranslationJob {
   sourceLanguage: string;
   targetLanguage: string;
   modelId: string;
+  fileId?: string;
   status: ETranslationStatus;
   totalRows: number;
   translatedRows: number;
