@@ -9,6 +9,7 @@ const uploadApiWithTag = baseApi.enhanceEndpoints({
 interface UploadCsvResponse {
   id?: string;
   fileId?: string;
+  file_id?: string;
   file_name?: string;
   filename?: string;
   name?: string;

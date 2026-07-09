@@ -10,6 +10,7 @@ export const modelApi = modelApiWithTag.injectEndpoints({
   endpoints: (builder) => ({
     getModels: builder.query<IGeminiModel[], void>({
       query: () => ENDPOINTS.MODELS,
+      transformResponse: (response: { models: IGeminiModel[]; total?: number }) => response.models,
       providesTags: ['Models'],
     }),
   }),

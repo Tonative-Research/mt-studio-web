@@ -1,4 +1,6 @@
-export const BASE_URL = import.meta.env.VITE_REACT_APP_MTSTUDIO_ENDPOINT;
+// Normalize base URL (remove trailing slashes) to avoid accidental double-slashes
+export const BASE_URL = (import.meta.env.VITE_REACT_APP_MTSTUDIO_ENDPOINT || '').replace(/\/+$/, '');
+// NOTE: above removes trailing slashes from the configured base URL.
 
 export const ENDPOINTS = {
   // Auth
@@ -9,7 +11,7 @@ export const ENDPOINTS = {
   AUTH_REFRESH: `/auth/refresh`,
 
   // Upload
-  UPLOAD_CSV: `/services/upload/`,
+  UPLOAD_CSV: `/services/upload`,
 
   // Translation
   TRANSLATE: `/services/translate/`,

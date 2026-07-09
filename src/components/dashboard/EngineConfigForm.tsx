@@ -15,11 +15,22 @@ import { saveSession } from '@/utils/sessionStorage';
 import type { IGeminiModel } from '@/services/types/model';
 
 const FALLBACK_LANGUAGE_OPTIONS = [
-  { value: 'en', label: 'English' },
-  { value: 'fr', label: 'French' },
-  { value: 'sw', label: 'Swahili' },
-  { value: 'ny', label: 'Chichewa' },
-  { value: 'yo', label: 'Yoruba' },
+  { value: 'auto', label: 'Automatic/Detect language' },
+  { value: 'eng', label: 'English' },
+  { value: 'ibo', label: 'Igbo' },
+  { value: 'yor', label: 'Yoruba' },
+  { value: 'hau', label: 'Hausa' },
+  { value: 'efi', label: 'Efik' },
+  { value: 'pcm', label: 'Nigerian Pidgin' },
+  { value: 'ewe', label: 'Ewe' },
+  { value: 'wol', label: 'Wolof' },
+  { value: 'amh', label: 'Amharic' },
+  { value: 'swh', label: 'Swahili' },
+  { value: 'luo', label: 'Luo' },
+  { value: 'xog', label: 'Soga' },
+  { value: 'kin', label: 'Kinyarwanda' },
+  { value: 'kik', label: 'Kikuyu' },
+  { value: 'nya', label: 'Chichewa' },
 ];
 
 const FALLBACK_MODEL_OPTIONS = [
@@ -39,9 +50,10 @@ export default function EngineConfigForm() {
   const selectedModel = useAppSelector((state) => state.modelConfig.selectedModel);
   const availableModels = useAppSelector((state) => state.modelConfig.availableModels ?? []);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const userEmail = useAppSelector((state) => state.auth.userEmail ?? '');
 
   const { data: models = [] } = useGetModelsQuery();
-  const { data: languages = [] } = useGetLanguagesQuery();
+  const { data: languages = [], isError, isFetching } = useGetLanguagesQuery();
   const [startTranslation] = useStartTranslationMutation();
 
   useEffect(() => {
@@ -90,16 +102,18 @@ export default function EngineConfigForm() {
             label: lang.name ?? lang.nativeName ?? lang.code ?? '',
           }))
           .filter((lang) => Boolean(lang.value && lang.label))
-      : FALLBACK_LANGUAGE_OPTIONS;
+      : [];
 
-    const hasSameLanguages = availableLanguages.length === nextLanguages.length
+    const knownLanguages = nextLanguages.length ? nextLanguages : FALLBACK_LANGUAGE_OPTIONS;
+
+    const hasSameLanguages = availableLanguages.length === knownLanguages.length
       && availableLanguages.every((language, index) => {
-        const candidate = nextLanguages[index];
+        const candidate = knownLanguages[index];
         return candidate && language.value === candidate.value && language.label === candidate.label;
       });
 
     if (!hasSameLanguages) {
-      dispatch(setAvailableLanguages(nextLanguages));
+      dispatch(setAvailableLanguages(knownLanguages));
     }
   }, [dispatch, languages, availableLanguages]);
 
@@ -113,43 +127,79 @@ export default function EngineConfigForm() {
     [availableModels],
   );
 
-  const languageOptions = useMemo(
-    () => availableLanguages.length ? availableLanguages : FALLBACK_LANGUAGE_OPTIONS,
+  const sourceLanguageOptions = useMemo(
+    () => availableLanguages,
+    [availableLanguages],
+  );
+
+  const targetLanguageOptions = useMemo(
+    () => availableLanguages.filter((lang) => lang.value !== 'auto'),
     [availableLanguages],
   );
 
   const handleSubmit = async () => {
     const modelToUse = selectedModel ?? availableModels[0];
+    const headers = columns.map((column) => column.name);
+    const targetColumnIndex = headers.indexOf(selectedTextColumn);
+    // map frontend model ids to backend model_name values accepted by the translate API
+    const modelNameMap: Record<string, string> = {
+      'Gemini_Flash': 'Gemini_Flash',
+      'Gemini_pro': 'Gemini_pro',
+    };
+    const rawModelName = modelNameMap[modelToUse?.id] ?? modelToUse?.name.replace(/\r?\n/g, '').replace(/\s+/g, '_');
 
-    if (!uploadedFile) {
-      dispatch(toast.error({ message: 'Please upload a CSV file before initializing translation.' }));
-      return;
-    }
 
-    if (!selectedTextColumn || !sourceLanguage || !targetLanguage || !modelToUse) {
+
+    if (!uploadedFile || !selectedTextColumn || !sourceLanguage || !targetLanguage || !modelToUse || targetColumnIndex < 0) {
       dispatch(toast.error({ message: 'Please upload a CSV file and complete all configuration fields.' }));
       return;
     }
+
+    const activeUploadedFile = uploadedFile;
 
     setIsSubmitting(true);
     dispatch(setTranslateError(null));
     dispatch(setJobStatus(ETranslationStatus.Pending));
 
     try {
-      const job = await startTranslation({
-        csvBase64: '',
-        fileId: uploadedFile.fileId ?? '',
-        fileName: uploadedFile.name,
-        textColumn: selectedTextColumn,
-        sourceLanguage,
-        targetLanguage,
-        modelId: modelToUse.id,
-      }).unwrap();
+      // map UI language codes to backend-accepted codes
+      const allowedLangs = ['auto','eng','ibo','yor','hau','efi','pcm','ewe','wol','amh','swh','luo','xog','kin','kik','nya'];
+      const normalizeLang = (code: string) => {
+        if (!code) return 'auto';
+        if (allowedLangs.includes(code)) return code;
+        // common mappings
+        if (code === 'en') return 'eng';
+        if (code === 'sw' || code === 'swh') return 'swh';
+        if (code === 'ny') return 'nya';
+        // fallback to auto if unknown (avoids server validation error)
+        return 'auto';
+      };
+
+      const mappedSource = normalizeLang(sourceLanguage);
+      const mappedTarget = normalizeLang(targetLanguage);
+      const mappedModelName = rawModelName;
+
+      const fileIdRaw = activeUploadedFile.fileId ?? '';
+      if (!fileIdRaw) {
+        throw new Error('Uploaded file is missing fileId. Please re-upload the CSV.');
+      }
+
+      const translatePayload = {
+        sourceLanguage: mappedSource,
+        targetLanguage: mappedTarget,
+        inferenceMode: 'fast',
+        modelId: mappedModelName,
+        fileId: fileIdRaw,
+        email: userEmail ?? '',
+        targetColumnIndex,
+      };
+
+      const job = await startTranslation(translatePayload).unwrap();
 
       const normalizedJob = {
         ...job,
         id: job.id || `${Date.now()}`,
-        fileName: job.fileName || uploadedFile.name,
+        fileName: job.fileName || activeUploadedFile.name,
         textColumn: job.textColumn || selectedTextColumn,
         sourceLanguage: job.sourceLanguage || sourceLanguage,
         targetLanguage: job.targetLanguage || targetLanguage,
@@ -163,8 +213,16 @@ export default function EngineConfigForm() {
       dispatch(setJobStatus(normalizedJob.status as ETranslationStatus));
       saveSession(normalizedJob);
       dispatch(toast.success({ message: `Translation job started. ID: ${normalizedJob.id}` }));
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unable to start translation.';
+    } catch (error: any) {
+      // Try to extract useful error information from RTK Query / fetch errors
+      let message = 'Unable to start translation.';
+      if (error) {
+        if (typeof error === 'string') message = error;
+        else if (error?.data) message = error.data?.message || error.data?.error || JSON.stringify(error.data);
+        else if (error?.message) message = error.message;
+        else message = JSON.stringify(error);
+      }
+
       dispatch(setTranslateError(message));
       dispatch(setJobStatus(ETranslationStatus.Failed));
       dispatch(toast.error({ message }));
@@ -185,13 +243,13 @@ export default function EngineConfigForm() {
       <div className="space-y-4 flex-1">
         <Select
           label="Source Language"
-          options={languageOptions}
+          options={sourceLanguageOptions}
           value={sourceLanguage}
           onChange={(event) => dispatch(setSourceLanguage(event.target.value))}
         />
         <Select
           label="Target Language"
-          options={languageOptions}
+          options={targetLanguageOptions}
           value={targetLanguage}
           onChange={(event) => dispatch(setTargetLanguage(event.target.value))}
         />

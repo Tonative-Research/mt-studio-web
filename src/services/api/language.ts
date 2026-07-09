@@ -10,6 +10,7 @@ export const languageApi = languageApiWithTag.injectEndpoints({
   endpoints: (builder) => ({
     getLanguages: builder.query<ILanguageOption[], void>({
       query: () => ENDPOINTS.LANGUAGES,
+      transformResponse: (response: { languages: ILanguageOption[]; total?: number }) => response.languages,
       providesTags: ['Languages'],
     }),
   }),
