@@ -13,11 +13,29 @@ const translateApiWithTag = baseApi.enhanceEndpoints({
 export const translateApi = translateApiWithTag.injectEndpoints({
   endpoints: (builder) => ({
     startTranslation: builder.mutation<ITranslationJob, ITranslateRequest>({
-      query: (data) => ({
-        url: ENDPOINTS.TRANSLATE,
-        method: 'POST',
-        body: data,
-      }),
+      query: (data) => {
+        const payload = {
+          source_lang: data.sourceLanguage,
+          target_lang: data.targetLanguage,
+          inference_mode: data.inferenceMode ?? 'fast',
+          model_name: data.modelId,
+          file_id: data.fileId,
+          email: data.email ?? '',
+          target_column_index: Number(data.targetColumnIndex),
+        };
+
+        console.log('translate.request', {
+          url: ENDPOINTS.TRANSLATE,
+          method: 'POST',
+          body: payload,
+        });
+
+        return {
+          url: ENDPOINTS.TRANSLATE,
+          method: 'POST',
+          body: payload,
+        };
+      },
       invalidatesTags: ['Translation'],
     }),
     getTranslationStatus: builder.query<ITranslationStatus, string>({
