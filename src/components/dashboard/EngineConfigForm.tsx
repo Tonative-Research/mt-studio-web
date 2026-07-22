@@ -33,10 +33,13 @@ const FALLBACK_LANGUAGE_OPTIONS = [
   { value: 'nya', label: 'Chichewa' },
 ];
 
+// Only used if GET /services/model/models fails outright. Mirrors the real
+// backend models exactly (confirmed via curl 2026-07-11) — do NOT add models
+// here that aren't in that list, POST /services/translate/ only accepts
+// model_name = 'Gemini_Flash' or 'Gemini_pro'.
 const FALLBACK_MODEL_OPTIONS = [
-  { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
-  { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' },
-  { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
+  { id: 'Gemini_Flash', name: 'Gemini Flash' },
+  { id: 'Gemini_pro', name: 'Gemini Pro' },
 ];
 
 export default function EngineConfigForm() {
@@ -89,7 +92,14 @@ export default function EngineConfigForm() {
       dispatch(setAvailableModels(nextModels));
     }
 
-    if (!selectedModel && nextModels.length) {
+    // Re-validate the persisted selection against the fresh list — redux-persist
+    // can keep a stale selectedModel (e.g. a fallback model id from a session
+    // where the models API failed) around indefinitely otherwise, since it's
+    // never re-checked once set.
+    const selectionIsStillValid = selectedModel
+      && nextModels.some((model) => model.id === selectedModel.id);
+
+    if (!selectionIsStillValid && nextModels.length) {
       dispatch(setSelectedModel(nextModels[0]));
     }
   }, [dispatch, models, selectedModel, availableModels]);
@@ -141,14 +151,12 @@ export default function EngineConfigForm() {
     const modelToUse = selectedModel ?? availableModels[0];
     const headers = columns.map((column) => column.name);
     const targetColumnIndex = headers.indexOf(selectedTextColumn);
-    // map frontend model ids to backend model_name values accepted by the translate API
-    const modelNameMap: Record<string, string> = {
-      'Gemini_Flash': 'Gemini_Flash',
-      'Gemini_pro': 'Gemini_pro',
-    };
-    const rawModelName = modelNameMap[modelToUse?.id] ?? modelToUse?.name.replace(/\r?\n/g, '').replace(/\s+/g, '_');
-
-
+    // model.id is already the exact model_name value the backend expects
+    // ('Gemini_Flash' / 'Gemini_pro') — confirmed via GET /services/model/models
+    // (2026-07-11). No transform needed; previously this guessed at a value by
+    // slugifying the display name, which broke for any model not already in
+    // an explicit map (e.g. a stale/fallback selection).
+    const rawModelName = modelToUse?.id;
 
     if (!uploadedFile || !selectedTextColumn || !sourceLanguage || !targetLanguage || !modelToUse || targetColumnIndex < 0) {
       dispatch(toast.error({ message: 'Please upload a CSV file and complete all configuration fields.' }));
