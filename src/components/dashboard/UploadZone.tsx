@@ -51,7 +51,6 @@ export default function UploadZone() {
       const formData = new FormData();
       formData.append('file', file);
       const response = await uploadCsv(formData).unwrap();
-      console.log('upload.response', response);
       const fileId = response.file_id ?? response.id ?? response.fileId ?? response.name ?? response.filename;
 
       if (!fileId) {

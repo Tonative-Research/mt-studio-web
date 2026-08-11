@@ -3,6 +3,7 @@ import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import LandingPage from '@/pages/LandingPage';
 import DashboardPage from '@/pages/DashboardPage';
 import HistoryPage from '@/pages/HistoryPage';
+import ActiveJobsTracker from '@/components/dashboard/ActiveJobsTracker';
 
 const isDev = import.meta.env.DEV;
 
@@ -23,6 +24,7 @@ export default function App() {
             <Route path="/dev/components" element={<ComponentShowcasePage />} />
           )}
         </Routes>
+        <ActiveJobsTracker />
       </ErrorBoundary>
     </BrowserRouter>
   );

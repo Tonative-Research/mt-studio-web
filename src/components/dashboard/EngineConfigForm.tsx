@@ -5,14 +5,12 @@ import { Select } from '@/components/common/Select';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setSelectedModel, setAvailableModels } from '@/redux/modelConfigSlice';
 import { setSelectedTextColumn, setSourceLanguage, setTargetLanguage, setAvailableLanguages } from '@/redux/uploadSlice';
-import { setCurrentJob, setJobStatus, setProgress, setTranslateError } from '@/redux/translateSlice';
+import { setCurrentJob, setTranslateError } from '@/redux/translateSlice';
 import { toast } from '@/redux/toastSlice';
 import { useGetModelsQuery } from '@/services/api/model';
 import { useGetLanguagesQuery } from '@/services/api/language';
 import { useStartTranslationMutation } from '@/services/api/translate';
 import { ETranslationStatus } from '@/services/types/translate';
-import { saveSession } from '@/utils/sessionStorage';
-import type { IGeminiModel } from '@/services/types/model';
 
 const FALLBACK_LANGUAGE_OPTIONS = [
   { value: 'auto', label: 'Automatic/Detect language' },
@@ -33,10 +31,13 @@ const FALLBACK_LANGUAGE_OPTIONS = [
   { value: 'nya', label: 'Chichewa' },
 ];
 
+// Only used if GET /services/model/models fails outright. Mirrors the real
+// backend models exactly (confirmed via curl 2026-07-11) — do NOT add models
+// here that aren't in that list, POST /services/translate/ only accepts
+// model_name = 'Gemini_Flash' or 'Gemini_pro'.
 const FALLBACK_MODEL_OPTIONS = [
-  { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
-  { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' },
-  { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
+  { id: 'Gemini_Flash', name: 'Gemini Flash' },
+  { id: 'Gemini_pro', name: 'Gemini Pro' },
 ];
 
 export default function EngineConfigForm() {
@@ -89,7 +90,13 @@ export default function EngineConfigForm() {
       dispatch(setAvailableModels(nextModels));
     }
 
-    if (!selectedModel && nextModels.length) {
+    // Re-validate the persisted selection against the fresh list — redux-persist
+    // can keep a stale selectedModel (e.g. a fallback model id from a session
+    // where the models API failed) around indefinitely otherwise, since it's
+    // never re-checked once set.
+    const selectionIsStillValid = selectedModel
+      && nextModels.some((model) => model.id === selectedModel.id);
+    if (!selectionIsStillValid && nextModels.length) {
       dispatch(setSelectedModel(nextModels[0]));
     }
   }, [dispatch, models, selectedModel, availableModels]);
@@ -141,14 +148,13 @@ export default function EngineConfigForm() {
     const modelToUse = selectedModel ?? availableModels[0];
     const headers = columns.map((column) => column.name);
     const targetColumnIndex = headers.indexOf(selectedTextColumn);
-    // map frontend model ids to backend model_name values accepted by the translate API
-    const modelNameMap: Record<string, string> = {
-      'Gemini_Flash': 'Gemini_Flash',
-      'Gemini_pro': 'Gemini_pro',
-    };
-    const rawModelName = modelNameMap[modelToUse?.id] ?? modelToUse?.name.replace(/\r?\n/g, '').replace(/\s+/g, '_');
 
-
+    // model.id is already the exact model_name value the backend expects
+    // ('Gemini_Flash' / 'Gemini_pro') — confirmed via GET /services/model/models
+    // (2026-07-11). No transform needed; previously this guessed at a value by
+    // slugifying the display name, which broke for any model not already in
+    // an explicit map (e.g. a stale/fallback selection).
+    const rawModelName = modelToUse?.id;
 
     if (!uploadedFile || !selectedTextColumn || !sourceLanguage || !targetLanguage || !modelToUse || targetColumnIndex < 0) {
       dispatch(toast.error({ message: 'Please upload a CSV file and complete all configuration fields.' }));
@@ -156,10 +162,8 @@ export default function EngineConfigForm() {
     }
 
     const activeUploadedFile = uploadedFile;
-
     setIsSubmitting(true);
     dispatch(setTranslateError(null));
-    dispatch(setJobStatus(ETranslationStatus.Pending));
 
     try {
       // map UI language codes to backend-accepted codes
@@ -205,13 +209,14 @@ export default function EngineConfigForm() {
         targetLanguage: job.targetLanguage || targetLanguage,
         modelId: job.modelId || modelToUse.id,
         status: job.status || ETranslationStatus.Pending,
+        percent: job.percent ?? 0,
         createdAt: job.createdAt || new Date().toISOString(),
       };
 
+      // setCurrentJob puts the job into both currentJob and activeJobs, and
+      // persists it to localStorage — ActiveJobsTracker picks up polling for
+      // it automatically as soon as it lands in activeJobs.
       dispatch(setCurrentJob(normalizedJob));
-      dispatch(setProgress({ progress: 0, translatedRows: 0, totalRows: normalizedJob.totalRows || 0 }));
-      dispatch(setJobStatus(normalizedJob.status as ETranslationStatus));
-      saveSession(normalizedJob);
       dispatch(toast.success({ message: `Translation job started. ID: ${normalizedJob.id}` }));
     } catch (error: any) {
       // Try to extract useful error information from RTK Query / fetch errors
@@ -222,9 +227,7 @@ export default function EngineConfigForm() {
         else if (error?.message) message = error.message;
         else message = JSON.stringify(error);
       }
-
       dispatch(setTranslateError(message));
-      dispatch(setJobStatus(ETranslationStatus.Failed));
       dispatch(toast.error({ message }));
     } finally {
       setIsSubmitting(false);

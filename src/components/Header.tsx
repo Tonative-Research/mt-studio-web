@@ -1,22 +1,29 @@
 import { Bell, User } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/common/Button';
 import { resetTranslateState } from '@/redux/translateSlice';
 import { useAppDispatch } from '@/redux/hooks';
+import { resetUploadState } from '@/redux/uploadSlice';
+import { resetModelConfig } from '@/redux/modelConfigSlice';
+import { persistor } from '@/redux/store';
 
 const navItems = [
   { label: 'Dashboard', to: '/dashboard' },
   { label: 'History', to: '/dashboard/history' },
-  { label: 'Settings', to: '/dashboard/settings' },
+  // { label: 'Settings', to: '/dashboard/settings' },
 ];
 
 export default function AppHeader() {
-  const { pathname } = useLocation();
+ const { pathname } = useLocation();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  function handleNewSession() {
+  async function handleNewSession() {
     dispatch(resetTranslateState());
-    window.location.reload();
+    dispatch(resetUploadState());
+    dispatch(resetModelConfig());
+    await persistor.flush(); // ensure the reset is written before navigating
+    navigate('/dashboard');
   }
 
   return (
