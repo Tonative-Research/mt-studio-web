@@ -4,22 +4,16 @@ import { Button } from '@/components/common/Button';
 import { Spinner } from '@/components/common/Spinner';
 import { useAppSelector } from '@/redux/hooks';
 import { useGetTranslationResultQuery } from '@/services/api/translate';
-import { ENDPOINTS, BASE_URL } from '@/services/api/endpoints';
 import { ETranslationStatus } from '@/services/types/translate';
-
-// Mirrors the dev-proxy logic in baseApiSlice.ts — in dev, hit the relative
-// path so it routes through the Vite proxy (avoids CORS); use the real
-// absolute BASE_URL in production builds.
-const effectiveBaseUrl = import.meta.env.DEV ? '' : BASE_URL;
+import { downloadTranslationCsv } from '@/utils/downloadTranslationCsv';
 
 export default function PreviewTable() {
   const currentJob = useAppSelector((state) => state.translate.currentJob);
-  const jobStatus = useAppSelector((state) => state.translate.jobStatus);
   const authToken = useAppSelector((state) => state.auth?.authToken);
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
 
-  const isCompleted = jobStatus === ETranslationStatus.Completed;
+  const isCompleted = currentJob?.status === ETranslationStatus.Completed;
 
   const { data: result, isLoading, isError } = useGetTranslationResultQuery(currentJob?.id ?? '', {
     skip: !currentJob || !isCompleted,
@@ -34,34 +28,7 @@ export default function PreviewTable() {
     setDownloadError(null);
     setIsDownloading(true);
     try {
-      const url = `${effectiveBaseUrl}${ENDPOINTS.EXPORT_CSV(currentJob.id)}`;
-      const response = await fetch(url, {
-        cache: 'no-store',
-        headers: {
-          accept: 'application/json',
-          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Download failed (${response.status})`);
-      }
-
-      const rawBlob = await response.blob();
-      // Prepend a UTF-8 BOM so Excel reliably detects UTF-8 instead of
-      // guessing (and garbling non-ASCII characters like Igbo/Yoruba
-      // diacritics) — the file itself was always valid UTF-8, Excel just
-      // needs this marker to know that.
-      const utf8Bom = new Uint8Array([0xef, 0xbb, 0xbf]);
-      const blob = new Blob([utf8Bom, rawBlob], { type: 'text/csv;charset=utf-8' });
-      const objectUrl = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = objectUrl;
-      link.download = `translation-${currentJob.id}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(objectUrl);
+      await downloadTranslationCsv(currentJob.id, authToken);
     } catch (err) {
       setDownloadError(err instanceof Error ? err.message : 'Something went wrong downloading the file.');
     } finally {

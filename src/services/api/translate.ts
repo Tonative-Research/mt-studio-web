@@ -28,12 +28,6 @@ export const translateApi = translateApiWithTag.injectEndpoints({
           target_column_index: Number(data.targetColumnIndex),
         };
 
-        console.log('translate.request', {
-          url: ENDPOINTS.TRANSLATE,
-          method: 'POST',
-          body: payload,
-        });
-
         return {
           url: ENDPOINTS.TRANSLATE,
           method: 'POST',

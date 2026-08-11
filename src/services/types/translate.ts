@@ -27,6 +27,10 @@ export interface ITranslationJob {
   status: ETranslationStatus;
   totalRows: number;
   translatedRows: number;
+  percent?: number;
+  message?: string;
+  hasErrors?: boolean;
+  fetchFailed?: boolean; // network/poll failure, distinct from a job-level error
   createdAt: string;
 }
 

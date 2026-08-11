@@ -3,6 +3,7 @@ import storage from 'redux-persist/lib/storage';
 import {
   persistReducer,
   persistStore,
+  createMigrate,
   FLUSH,
   PAUSE,
   PERSIST,
@@ -20,10 +21,26 @@ import uploadReducer from '@/redux/uploadSlice';
 import modelConfigReducer from '@/redux/modelConfigSlice';
 import toastReducer from '@/redux/toastSlice';
 
+// v1: translate slice moved from a single `currentJob` to `currentJob` +
+// `activeJobs` (a map keyed by job id) to support tracking multiple
+// concurrent translation jobs. Old persisted state won't have `activeJobs`
+// at all, which crashes any reducer that does `state.activeJobs[id] = ...`.
+const migrations = {
+  1: (state: any) => ({
+    ...state,
+    translate: {
+      ...state.translate,
+      activeJobs: state.translate?.activeJobs ?? {},
+    },
+  }),
+};
+
 const persistConfig = {
   key: 'root',
+  version: 1,
   storage,
   blacklist: [baseApi.reducerPath],
+  migrate: createMigrate(migrations, { debug: false }),
 };
 
 const rootReducer = combineReducers({

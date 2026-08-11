@@ -5,14 +5,12 @@ import { Select } from '@/components/common/Select';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { setSelectedModel, setAvailableModels } from '@/redux/modelConfigSlice';
 import { setSelectedTextColumn, setSourceLanguage, setTargetLanguage, setAvailableLanguages } from '@/redux/uploadSlice';
-import { setCurrentJob, setJobStatus, setProgress, setTranslateError } from '@/redux/translateSlice';
+import { setCurrentJob, setTranslateError } from '@/redux/translateSlice';
 import { toast } from '@/redux/toastSlice';
 import { useGetModelsQuery } from '@/services/api/model';
 import { useGetLanguagesQuery } from '@/services/api/language';
 import { useStartTranslationMutation } from '@/services/api/translate';
 import { ETranslationStatus } from '@/services/types/translate';
-import { saveSession } from '@/utils/sessionStorage';
-import type { IGeminiModel } from '@/services/types/model';
 
 const FALLBACK_LANGUAGE_OPTIONS = [
   { value: 'auto', label: 'Automatic/Detect language' },
@@ -98,7 +96,6 @@ export default function EngineConfigForm() {
     // never re-checked once set.
     const selectionIsStillValid = selectedModel
       && nextModels.some((model) => model.id === selectedModel.id);
-
     if (!selectionIsStillValid && nextModels.length) {
       dispatch(setSelectedModel(nextModels[0]));
     }
@@ -151,6 +148,7 @@ export default function EngineConfigForm() {
     const modelToUse = selectedModel ?? availableModels[0];
     const headers = columns.map((column) => column.name);
     const targetColumnIndex = headers.indexOf(selectedTextColumn);
+
     // model.id is already the exact model_name value the backend expects
     // ('Gemini_Flash' / 'Gemini_pro') — confirmed via GET /services/model/models
     // (2026-07-11). No transform needed; previously this guessed at a value by
@@ -164,10 +162,8 @@ export default function EngineConfigForm() {
     }
 
     const activeUploadedFile = uploadedFile;
-
     setIsSubmitting(true);
     dispatch(setTranslateError(null));
-    dispatch(setJobStatus(ETranslationStatus.Pending));
 
     try {
       // map UI language codes to backend-accepted codes
@@ -213,13 +209,14 @@ export default function EngineConfigForm() {
         targetLanguage: job.targetLanguage || targetLanguage,
         modelId: job.modelId || modelToUse.id,
         status: job.status || ETranslationStatus.Pending,
+        percent: job.percent ?? 0,
         createdAt: job.createdAt || new Date().toISOString(),
       };
 
+      // setCurrentJob puts the job into both currentJob and activeJobs, and
+      // persists it to localStorage — ActiveJobsTracker picks up polling for
+      // it automatically as soon as it lands in activeJobs.
       dispatch(setCurrentJob(normalizedJob));
-      dispatch(setProgress({ progress: 0, translatedRows: 0, totalRows: normalizedJob.totalRows || 0 }));
-      dispatch(setJobStatus(normalizedJob.status as ETranslationStatus));
-      saveSession(normalizedJob);
       dispatch(toast.success({ message: `Translation job started. ID: ${normalizedJob.id}` }));
     } catch (error: any) {
       // Try to extract useful error information from RTK Query / fetch errors
@@ -230,9 +227,7 @@ export default function EngineConfigForm() {
         else if (error?.message) message = error.message;
         else message = JSON.stringify(error);
       }
-
       dispatch(setTranslateError(message));
-      dispatch(setJobStatus(ETranslationStatus.Failed));
       dispatch(toast.error({ message }));
     } finally {
       setIsSubmitting(false);
